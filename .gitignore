@@ -10,3 +10,4 @@ build/
 .vercel
 .wrangler/
 out/
+*.tsbuildinfo
