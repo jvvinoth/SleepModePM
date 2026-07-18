@@ -12,7 +12,25 @@ import {
   Play,
   X,
   Radar,
+  Volume2,
 } from "lucide-react";
+
+/** Voice readout of an idea card. Uses the browser speech engine now; designed to run on a
+ *  Nosana-hosted TTS model in production. */
+function speakCard(card: IdeaCard) {
+  try {
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    synth.cancel();
+    const text = `${card.title}. ${card.rationale} Plan: ${card.bullets.join(". ")}. Impact ${card.impact}, effort ${card.effort}, risk ${card.risk}.`;
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.02;
+    u.pitch = 1;
+    synth.speak(u);
+  } catch {
+    /* speech not available */
+  }
+}
 
 const CATEGORY_ICON: Record<string, typeof Shield> = {
   security: Shield,
@@ -69,7 +87,17 @@ export function IdeaCardView({
       </div>
 
       <div>
-        <h3 className="text-[16px] font-semibold leading-snug">{card.title}</h3>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-[16px] font-semibold leading-snug">{card.title}</h3>
+          <button
+            onClick={() => speakCard(card)}
+            title="Read this idea aloud (voice · Nosana)"
+            className="shrink-0 mt-0.5 flex items-center justify-center w-7 h-7 rounded-lg"
+            style={{ background: accentTint, color: accent }}
+          >
+            <Volume2 size={15} strokeWidth={2} />
+          </button>
+        </div>
         <p className="text-[13px] mt-1" style={{ color: "var(--text-2)" }}>
           {card.rationale}
         </p>
