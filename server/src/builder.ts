@@ -36,7 +36,8 @@ FULL file contents (never diffs, never placeholders, never "rest of file unchang
 
 async function generatePlan(card: IdeaCard, repo: string, repairNote?: string): Promise<Plan> {
   const fileBodies: string[] = [];
-  for (const path of card.targetFiles.slice(0, 5)) {
+  // Cap to the primary file — smaller output = fast, reliable builds (demo-critical).
+  for (const path of card.targetFiles.slice(0, 1)) {
     const content = await fetchFile(repo, path);
     fileBodies.push(
       content === null
@@ -56,9 +57,10 @@ CURRENT FILES:
 ${fileBodies.join("\n\n")}
 ${repairNote ? `\n⚠️ PREVIOUS ATTEMPT FAILED. Error from the dev server:\n${repairNote}\nFix the mistake and return corrected files.` : ""}
 
-TASK: Implement this change. Modify existing files and/or create new ones. Keep the change
-tight and self-contained — do NOT refactor unrelated code. Preserve all existing exports,
-imports and behavior except what the change requires. The app must still build.
+TASK: Implement the SINGLE most important part of this change by editing ONLY the file shown
+above (return exactly ONE file). Keep it tight and self-contained — do NOT refactor unrelated
+code. Preserve all existing exports, imports and behavior except what the change requires.
+The app MUST still build and run.
 
 Return ONLY JSON: {"summary":"one line describing the change","files":[{"path":"src/...","content":"<FULL new file content>"}]}`;
 
