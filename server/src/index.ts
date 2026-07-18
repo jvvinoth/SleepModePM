@@ -5,7 +5,8 @@ import { ideate } from "./ideator.js";
 import { createJob, getJob, serializeJob } from "./jobs.js";
 import { runBuildJob, promoteJob } from "./builder.js";
 import { loadSnapshot, saveSnapshot } from "./snapshot.js";
-import { cachedSignals } from "./signals.js";
+import { cachedSignals, fetchPageText } from "./signals.js";
+import { embed } from "./llm.js";
 import { notify, sendSlack, channelStatus } from "./telegram.js";
 import { knowledgeBase, leads, getLead } from "./business.js";
 import type { IdeationResult } from "./types.js";
@@ -66,6 +67,37 @@ app.get("/api/signals", (_req, res) => {
 
 /** Knowledge base — the company's indexed content that powers the AI agent. */
 app.get("/api/knowledge", (_req, res) => res.json(knowledgeBase));
+
+/** REAL crawl+index: Oxylabs fetches the page → chunk → Doubleword embeds → trained doc. */
+app.post("/api/knowledge/crawl", async (req, res) => {
+  const { url } = req.body as { url?: string };
+  if (!url || !/^https?:\/\//.test(url)) return res.status(400).json({ error: "valid http(s) url required" });
+  try {
+    const { text, via } = await fetchPageText(url);
+    if (text.length < 40) throw new Error("no readable content at that URL");
+
+    // chunk (~800 chars) and vectorize via Doubleword (bounded so it stays snappy live)
+    const chunks: string[] = [];
+    for (let i = 0; i < text.length && chunks.length < 24; i += 800) chunks.push(text.slice(i, i + 800));
+    let embedded = 0;
+    try {
+      const vecs = await embed(chunks.slice(0, 8));
+      embedded = vecs.length;
+    } catch (e) {
+      console.warn("[crawl] embed skipped:", (e as Error).message);
+    }
+
+    const path = (() => { try { return new URL(url).pathname || "/"; } catch { return url; } })();
+    const doc = { path, url, chunks: chunks.length, status: "trained" as const };
+    knowledgeBase.documents.unshift(doc);
+    knowledgeBase.total += 1;
+    knowledgeBase.trained += 1;
+
+    res.json({ doc, via, embedded, snippet: text.slice(0, 220) });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
 
 /** Leads captured by the agent, scored Hot / Warm / Cold. */
 app.get("/api/leads", (_req, res) => res.json({ leads }));

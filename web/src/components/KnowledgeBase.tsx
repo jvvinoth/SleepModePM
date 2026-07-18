@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Globe, Map, FileText, Type, Video, Plus, RefreshCw, Trash2, Check, ArrowLeft, Database } from "lucide-react";
+import { Globe, Map, FileText, Type, Video, Plus, RefreshCw, Trash2, Check, ArrowLeft, Database, Loader2, Zap } from "lucide-react";
 import { ORCH_URL, type KnowledgeBase } from "@/lib/types";
 
 const SOURCES = [
@@ -26,10 +26,42 @@ export function KnowledgeBaseView() {
   const [adding, setAdding] = useState(false);
   const [selected, setSelected] = useState("Website");
   const [q, setQ] = useState("");
+  const [url, setUrl] = useState("");
+  const [crawling, setCrawling] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${ORCH_URL}/api/knowledge`).then((r) => r.json()).then(setKb).catch(() => {});
   }, []);
+
+  const crawl = async () => {
+    if (!url || crawling) return;
+    setCrawling(true);
+    setToast(null);
+    try {
+      const r = await fetch(`${ORCH_URL}/api/knowledge/crawl`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      }).then((x) => x.json());
+      if (r.error) {
+        setToast(`⚠️ ${r.error}`);
+      } else {
+        setKb((prev) =>
+          prev
+            ? { ...prev, total: prev.total + 1, trained: prev.trained + 1, documents: [r.doc, ...prev.documents] }
+            : prev
+        );
+        setToast(`✅ Crawled via ${r.via === "oxylabs" ? "Oxylabs" : "direct fetch"} · ${r.doc.chunks} chunks · ${r.embedded} embedded (Doubleword)`);
+        setUrl("");
+      }
+    } catch (e) {
+      setToast(`⚠️ ${String(e)}`);
+    } finally {
+      setCrawling(false);
+      setTimeout(() => setToast(null), 6000);
+    }
+  };
 
   if (adding) {
     return (
@@ -81,6 +113,28 @@ export function KnowledgeBaseView() {
           <p className="text-[13.5px] mt-1" style={{ color: "var(--text-2)" }}>Crawl &amp; index your content — this trains the AI agent that captures leads.</p>
         </div>
         <button className="btn-primary flex items-center gap-1.5" onClick={() => setAdding(true)}><Plus size={15} strokeWidth={2.4} /> Add content</button>
+      </div>
+
+      {/* Add a URL — REAL crawl via Oxylabs → chunk → embed via Doubleword */}
+      <div className="card p-5 my-5">
+        <div className="text-[14px] font-semibold mb-2.5">Add a URL <span className="font-normal" style={{ color: "var(--text-3)" }}>· crawled live through Oxylabs, embedded by Doubleword</span></div>
+        <div className="flex gap-2">
+          <input
+            className="flex-1 rounded-lg px-3 text-[14px]"
+            style={{ height: 40, border: "1px solid var(--border)" }}
+            placeholder="https://yoursite.com/page"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && crawl()}
+            disabled={crawling}
+          />
+          <button className="btn-primary flex items-center gap-1.5" onClick={crawl} disabled={crawling}>
+            {crawling ? <><Loader2 size={15} className="animate-spin" /> Crawling…</> : <><Zap size={15} /> Crawl &amp; index</>}
+          </button>
+        </div>
+        {toast && (
+          <div className="text-[13px] mt-2.5" style={{ color: toast.startsWith("⚠️") ? "var(--red-500)" : "var(--green-text)" }}>{toast}</div>
+        )}
       </div>
 
       <div className="grid grid-cols-4 gap-3 my-5">

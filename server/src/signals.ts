@@ -61,6 +61,25 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+/** Fetch a page's text — through Oxylabs proxy if available, else direct. Used by the crawler. */
+export async function fetchPageText(url: string): Promise<{ text: string; via: "oxylabs" | "direct" }> {
+  const agent = oxylabsAgent();
+  if (agent) {
+    try {
+      const html = await getThroughProxy(url, agent);
+      return { text: stripHtml(html), via: "oxylabs" };
+    } catch {
+      /* proxy blocked (e.g. venue wifi) — fall back to direct */
+    }
+  }
+  const res = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" },
+    signal: AbortSignal.timeout(20000),
+  });
+  if (!res.ok) throw new Error(`fetch ${res.status}`);
+  return { text: stripHtml(await res.text()), via: "direct" };
+}
+
 export interface CompetitorSignal extends Signal {
   name: string;
   text: string; // extracted page text for the Ideator
