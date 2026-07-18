@@ -11,6 +11,7 @@ import {
   FileCode2,
   Play,
   X,
+  Radar,
 } from "lucide-react";
 
 const CATEGORY_ICON: Record<string, typeof Shield> = {
@@ -82,6 +83,24 @@ export function IdeaCardView({
           </li>
         ))}
       </ul>
+
+      {card.signal && (
+        <a
+          href={card.signal.url}
+          target="_blank"
+          className="flex items-start gap-2 rounded-md px-2.5 py-2 text-[12px] leading-snug"
+          style={{ background: accentTint, color: "var(--text-2)" }}
+        >
+          <Radar size={13} className="shrink-0 mt-0.5" style={{ color: accent }} />
+          <span>
+            <span className="font-medium" style={{ color: accent }}>
+              {card.signal.source}
+            </span>
+            {" — "}
+            {card.signal.summary}
+          </span>
+        </a>
+      )}
 
       {card.targetFiles.length > 0 && (
         <div

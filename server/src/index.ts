@@ -75,4 +75,12 @@ app.post("/api/promote", async (req, res) => {
 
 app.listen(config.port, () => {
   console.log(`orchestrator listening on :${config.port}`);
+  // Warm the ideation cache on boot — "it ran overnight". First visitor sees cards instantly.
+  inflight = ideate()
+    .then((r) => (cache = r))
+    .catch((e) => {
+      console.warn("[warmup] ideation failed:", (e as Error).message);
+      return null as never;
+    })
+    .finally(() => (inflight = null)) as Promise<IdeationResult>;
 });
