@@ -80,6 +80,7 @@ export function DashboardView({ data, onNavigate }: { data: IdeationResult; onNa
 /* ─── Codebase: Engineering persona ─── */
 export function CodebaseView({ data, onBuild, buildPanel, onRescan, scanning }: { data: IdeationResult; onBuild: (c: IdeaCard) => void; buildPanel: ReactNode; onRescan: () => void; scanning: boolean }) {
   const cards = data.cards.filter((c) => c.track === "level_up");
+  const next = data.cards.filter((c) => c.track === "whats_next");
   return (
     <>
       <RepoHeader data={data} />
@@ -100,6 +101,19 @@ export function CodebaseView({ data, onBuild, buildPanel, onRescan, scanning }: 
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
         {cards.map((c) => <IdeaCardView key={c.id} card={c} onBuild={onBuild} />)}
       </div>
+
+      {next.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 mt-8 mb-1">
+            <Flame size={18} style={{ color: "var(--purple-500)" }} />
+            <h2 className="text-[16px] font-semibold">What&apos;s Next — new features to build</h2>
+          </div>
+          <p className="text-[13px] mb-5" style={{ color: "var(--text-2)" }}>Net-new opportunities from your codebase &amp; market. Same one-tap build → preview.</p>
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
+            {next.map((c) => <IdeaCardView key={c.id} card={c} onBuild={onBuild} />)}
+          </div>
+        </>
+      )}
     </>
   );
 }

@@ -1,34 +1,32 @@
 {
   "repo": {
     "repo": "jvvinoth/mongpt-marketing",
-    "description": "MonGPT's marketing site — a statically exported Next.js app on Cloudflare Pages promoting an AI chat + voice support agent localized for Asian markets. It doubles as an SEO engine with 25+ free tools (AI generators, markdown converters, URL utilities) and an 8-language docs hub.",
-    "framework": "Next.js 16 (static export), TypeScript, Tailwind CSS v4, Cloudflare Pages",
+    "description": "Marketing site for MonGPT, an AI chatbot and voice support agent targeting Asian-language markets. Static Next.js export on Cloudflare Pages with 30+ free SEO tools, docs hub, and 8 locale variants with geo-redirect.",
+    "framework": "Next.js 16 (static export) on Cloudflare Pages",
     "fileCount": 129,
     "keyAreas": [
-      "i18n geo-routing",
-      "free-tools SEO mesh",
-      "docs hub",
-      "demo API integration",
-      "static sitemap generation"
+      "Free tools (converters/generators)",
+      "i18n with geo-redirect middleware",
+      "Docs hub with 13 articles",
+      "Demo API integration"
     ]
   },
   "cards": [
     {
       "track": "level_up",
-      "title": "Add security headers and file upload validation",
-      "rationale": "Demo API endpoints accept unvalidated file uploads and the edge middleware sets zero security headers.",
+      "title": "Add security headers and rate limiting in middleware",
+      "rationale": "functions/_middleware.js only does geo-redirect; no CSP, HSTS, or API throttling.",
       "bullets": [
-        "Add CSP, X-Frame-Options, HSTS in _middleware.js",
-        "Validate file size and MIME type before parse-file upload",
-        "Cap textarea input length on generator and chat endpoints"
+        "Add CSP, HSTS, X-Frame-Options headers to all responses",
+        "Rate-limit /api/demo/* calls per IP in Cloudflare worker",
+        "Add CORS restrictions for demo API endpoints"
       ],
       "category": "security",
       "impact": "high",
-      "effort": "S",
-      "risk": "low",
+      "effort": "M",
+      "risk": "medium",
       "targetFiles": [
         "functions/_middleware.js",
-        "src/components/ConverterTool.tsx",
         "src/components/ChatWithSource.tsx",
         "src/components/GeneratorTool.tsx"
       ],
@@ -37,31 +35,12 @@
     },
     {
       "track": "level_up",
-      "title": "Add mobile hamburger menu to site header",
-      "rationale": "Nav links are hidden below md breakpoint with no alternative — mobile visitors lose all navigation.",
+      "title": "Add unit tests for markdown converters",
+      "rationale": "Pure functions in toMarkdown.ts have zero coverage and no test framework is installed.",
       "bullets": [
-        "Add collapsible drawer toggled below md breakpoint",
-        "Reuse existing LocaleSwitcher and CTA in drawer",
-        "Match sticky header backdrop-blur styling"
-      ],
-      "category": "ux",
-      "impact": "high",
-      "effort": "S",
-      "risk": "low",
-      "targetFiles": [
-        "src/components/Header.tsx"
-      ],
-      "id": "card-2",
-      "status": "proposed"
-    },
-    {
-      "track": "level_up",
-      "title": "Add unit tests for markdown conversion utilities",
-      "rationale": "Five pure converter functions in toMarkdown.ts power 7 tool pages with zero test coverage.",
-      "bullets": [
-        "Add vitest and test htmlToMarkdown, csvToMarkdown, jsonToMarkdown",
-        "Cover xmlToMarkdown and textToMarkdown edge cases",
-        "Test nested HTML, malformed JSON, empty CSV inputs"
+        "Install vitest, add tests for htmlToMarkdown and csvToMarkdown",
+        "Cover edge cases: empty input, malformed JSON/XML, large files",
+        "Run tests in prebuild step alongside render-prompt.mjs"
       ],
       "category": "tests",
       "impact": "medium",
@@ -69,77 +48,96 @@
       "risk": "low",
       "targetFiles": [
         "src/lib/toMarkdown.ts",
-        "package.json"
+        "package.json",
+        "scripts/render-prompt.mjs"
+      ],
+      "id": "card-2",
+      "status": "proposed"
+    },
+    {
+      "track": "level_up",
+      "title": "Add mobile navigation drawer to header",
+      "rationale": "Header.tsx hides nav with hidden md:flex; mobile users cannot browse the site.",
+      "bullets": [
+        "Add hamburger button toggle in Header.tsx",
+        "Create slide-out drawer with all nav links",
+        "Include locale switcher and CTA in drawer"
+      ],
+      "category": "ux",
+      "impact": "high",
+      "effort": "M",
+      "risk": "low",
+      "targetFiles": [
+        "src/components/Header.tsx",
+        "src/lib/dict/en.ts",
+        "src/lib/dict/types.ts"
       ],
       "id": "card-3",
       "status": "proposed"
     },
     {
       "track": "whats_next",
-      "title": "Add competitor comparison pages for SEO capture",
-      "rationale": "Intercom and Tidio rank page-one for 'Intercom alternative' — MonGPT is invisible there despite a cheaper, multi-language product.",
+      "title": "Surface live chatbot demo on homepage",
+      "rationale": "DemoWidget.tsx exists but is never rendered; competitors show live demos above the fold.",
       "bullets": [
-        "Build /compare/[slug] pages for Intercom, Tidio, Crisp",
-        "Feature-by-feature comparison table with pricing deltas",
-        "Add comparison routes to sitemap.ts and footer mesh"
+        "Import and render DemoWidget in HomePage.tsx hero section",
+        "Add multilingual sample prompts (Hindi, Tamil, Chinese)",
+        "Show chat transcript preview for no-JS visitors"
       ],
-      "category": "growth",
+      "category": "feature",
       "impact": "high",
-      "effort": "M",
+      "effort": "S",
       "risk": "low",
       "targetFiles": [
-        "src/app/compare/[slug]/page.tsx",
-        "src/components/CompareTable.tsx",
-        "src/app/sitemap.ts",
-        "src/components/Footer.tsx"
+        "src/components/HomePage.tsx",
+        "src/components/DemoWidget.tsx",
+        "src/app/page.tsx"
       ],
       "id": "card-4",
       "status": "proposed"
     },
     {
       "track": "whats_next",
-      "title": "Add interactive no-signup product demo page",
-      "rationale": "Visitors cannot try the chatbot without creating an account — the highest-friction point in the funnel.",
+      "title": "Add competitor comparison pages",
+      "rationale": "Tidio and Intercom capture high-intent vs-search traffic with dedicated comparison pages.",
       "bullets": [
-        "New /demo page with pre-loaded sample knowledge base",
-        "Embed DemoWidget with sample tenant and guided prompt chips",
-        "Show 'Powered by MonGPT' signup CTA after each answer"
+        "Create /compare/[slug] dynamic route for vs pages",
+        "Add MonGPT vs Tidio, Intercom, Chatra comparison data",
+        "Link comparison pages from Footer and pricing page"
       ],
-      "category": "feature",
-      "impact": "high",
+      "category": "growth",
+      "impact": "medium",
       "effort": "M",
-      "risk": "medium",
+      "risk": "low",
       "targetFiles": [
-        "src/app/demo/page.tsx",
-        "src/components/InteractiveDemo.tsx",
-        "src/components/DemoWidget.tsx",
-        "src/app/sitemap.ts"
+        "src/app/compare/[slug]/page.tsx",
+        "src/components/Footer.tsx",
+        "src/app/pricing/page.tsx"
       ],
       "id": "card-5",
       "status": "proposed"
     },
     {
       "track": "whats_next",
-      "title": "Add WhatsApp Business integration landing page",
-      "rationale": "WhatsApp is the dominant support channel in MonGPT's target markets (India, Indonesia, Philippines) yet no integration page exists.",
+      "title": "Add trending tools showcase section",
+      "rationale": "30+ free tools lack social proof; a trending section drives discovery and engagement.",
       "bullets": [
-        "New /whatsapp page mirroring /wordpress structure",
-        "Diagram AI chatbot + WhatsApp Business API flow",
-        "Add to sitemap, footer, and Header nav"
+        "Add trending tools grid to ToolsIndex.tsx landing",
+        "Tag tools by popularity tier in tools.ts",
+        "Add 'most used this week' badge component"
       ],
       "category": "feature",
       "impact": "medium",
-      "effort": "S",
+      "effort": "M",
       "risk": "low",
       "targetFiles": [
-        "src/app/whatsapp/page.tsx",
-        "src/components/Footer.tsx",
-        "src/components/Header.tsx",
-        "src/app/sitemap.ts"
+        "src/components/ToolsIndex.tsx",
+        "src/app/tools/page.tsx",
+        "src/lib/tools.ts"
       ],
       "id": "card-6",
       "status": "proposed"
     }
   ],
-  "generatedAt": "2026-07-18T07:37:25.708Z"
+  "generatedAt": "2026-07-18T07:50:24.721Z"
 }
