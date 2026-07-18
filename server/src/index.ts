@@ -8,7 +8,7 @@ import { loadSnapshot, saveSnapshot } from "./snapshot.js";
 import { cachedSignals, fetchPageText } from "./signals.js";
 import { embed } from "./llm.js";
 import { notify, sendSlack, channelStatus } from "./telegram.js";
-import { knowledgeBase, leads, getLead } from "./business.js";
+import { knowledgeBase, addCrawledDoc, regenerateLeads, leadsState, getLead } from "./business.js";
 import type { IdeationResult } from "./types.js";
 
 // Never let a stray rejection take the orchestrator down (Railway = crash loop otherwise).
@@ -87,11 +87,12 @@ app.post("/api/knowledge/crawl", async (req, res) => {
       console.warn("[crawl] embed skipped:", (e as Error).message);
     }
 
-    const path = (() => { try { return new URL(url).pathname || "/"; } catch { return url; } })();
-    const doc = { path, url, chunks: chunks.length, status: "trained" as const };
-    knowledgeBase.documents.unshift(doc);
-    knowledgeBase.total += 1;
-    knowledgeBase.trained += 1;
+    const u = (() => { try { return new URL(url); } catch { return null; } })();
+    const doc = { path: u?.pathname || "/", url, chunks: chunks.length, status: "trained" as const };
+    addCrawledDoc(doc, text, u?.hostname ?? "");
+
+    // regenerate leads grounded in the new knowledge (background — Leads view polls)
+    void regenerateLeads();
 
     res.json({ doc, via, embedded, snippet: text.slice(0, 220) });
   } catch (err) {
@@ -99,8 +100,8 @@ app.post("/api/knowledge/crawl", async (req, res) => {
   }
 });
 
-/** Leads captured by the agent, scored Hot / Warm / Cold. */
-app.get("/api/leads", (_req, res) => res.json({ leads }));
+/** Leads captured by the agent, scored Hot / Warm / Cold (generated from the knowledge base). */
+app.get("/api/leads", (_req, res) => res.json(leadsState()));
 
 /** Notification channels + status (Telegram/Slack enabled, others coming soon). */
 app.get("/api/channels", (_req, res) => res.json({ channels: channelStatus() }));

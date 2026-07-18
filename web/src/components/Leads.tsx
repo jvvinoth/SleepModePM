@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Flame, Sun, Snowflake, Send, Check, MessageSquare, MapPin, Clock, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Flame, Sun, Snowflake, Send, Check, MessageSquare, MapPin, Clock, Zap, Loader2, Database } from "lucide-react";
 import { ORCH_URL, type Lead, type Temp } from "@/lib/types";
 
 const TEMP: Record<Temp, { label: string; icon: typeof Flame; color: string; tint: string; text: string }> = {
@@ -70,10 +70,22 @@ function LeadCard({ lead, onAlert }: { lead: Lead; onAlert: (l: Lead) => void })
 
 export function LeadsView() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [status, setStatus] = useState<string>("empty");
   const [toast, setToast] = useState<string | null>(null);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    fetch(`${ORCH_URL}/api/leads`).then((r) => r.json()).then((d) => setLeads(d.leads ?? [])).catch(() => {});
+    const poll = () =>
+      fetch(`${ORCH_URL}/api/leads`)
+        .then((r) => r.json())
+        .then((d) => {
+          setLeads(d.leads ?? []);
+          setStatus(d.status ?? "empty");
+        })
+        .catch(() => {});
+    poll();
+    timer.current = setInterval(poll, 3500); // keep polling while the agent generates
+    return () => clearInterval(timer.current!);
   }, []);
 
   const alert = async (l: Lead) => {
@@ -96,6 +108,26 @@ export function LeadsView() {
         Your AI agent talks to visitors using the knowledge base, scores their intent, and routes hot leads to your team instantly.
       </p>
 
+      {leads.length === 0 && status !== "ready" ? (
+        <div className="card flex flex-col items-center justify-center text-center py-20 px-6 gap-3">
+          {status === "generating" ? (
+            <>
+              <Loader2 size={28} className="animate-spin" style={{ color: "var(--purple-500)" }} />
+              <div className="text-[15px] font-medium">Your agent is reading the knowledge base…</div>
+              <div className="text-[13px]" style={{ color: "var(--text-2)" }}>Generating leads grounded in what you just crawled.</div>
+            </>
+          ) : (
+            <>
+              <Database size={28} style={{ color: "var(--text-3)" }} />
+              <div className="text-[15px] font-medium">No leads yet</div>
+              <div className="text-[13px] max-w-sm" style={{ color: "var(--text-2)" }}>
+                Add a page to your <strong>Knowledge Base</strong> — the agent trains on it and starts capturing leads whose questions reference your content.
+              </div>
+            </>
+          )}
+        </div>
+      ) : (
+      <>
       {/* stat row */}
       <div className="grid grid-cols-4 gap-3 mb-6">
         {([["Total leads", leads.length, "var(--text-1)", null],
@@ -127,6 +159,8 @@ export function LeadsView() {
           );
         })}
       </div>
+      </>
+      )}
 
       {toast && (
         <div className="fixed bottom-6 right-6 card px-4 py-3 text-[13.5px] font-medium flex items-center gap-2 !shadow-xl" style={{ zIndex: 60 }}>
