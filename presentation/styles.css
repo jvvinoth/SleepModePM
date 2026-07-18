@@ -443,6 +443,64 @@ p {
   border-bottom: 1px solid var(--border-color);
 }
 
+.tab-example-card {
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  margin: 16px 0;
+}
+
+.example-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.example-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.example-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.meta-tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: #e5e7eb;
+  color: #374151;
+  font-weight: 600;
+}
+
+.meta-tag.high {
+  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+  color: #991b1b;
+}
+
+.meta-tag.rising {
+  background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+  color: #1e40af;
+}
+
+.tab-source {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+.tab-source strong {
+  color: var(--text-primary);
+}
+
 /* Flow Diagram */
 .flow-diagram {
   display: flex;
