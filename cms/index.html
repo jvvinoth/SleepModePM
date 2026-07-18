@@ -174,18 +174,121 @@
         </div>
       </section>
 
-      <section id="how" class="section">
+      <section id="how" class="section how-section">
         <div class="container">
+          <p class="eyebrow">⚡ The complete intelligence-to-execution loop</p>
           <h2>How SleepMode PM works</h2>
-          <p class="section-intro">Intelligence-first approach that turns market signals into shippable decisions.</p>
+          <p class="section-intro">While you sleep, a multi-agent system analyzes your codebase and market. You wake up to prioritized decisions and execute in 90 seconds.</p>
 
-          <div class="flow-grid">
-            <article class="flow-step card"><h3>1. Market Scout</h3><p>Tracks industry trends, emerging technologies, and user demand patterns across your market.</p></article>
-            <article class="flow-step card"><h3>2. Competitor Monitor</h3><p>Analyzes what competitors are shipping, which features gain traction, and where gaps exist.</p></article>
-            <article class="flow-step card"><h3>3. Lead Generator</h3><p>Identifies opportunities that drive customer acquisition, improve conversion, and increase retention.</p></article>
-            <article class="flow-step card"><h3>4. Repo Analyzer</h3><p>Scans your codebase for technical opportunities: security fixes, performance wins, and quality improvements.</p></article>
-            <article class="flow-step card"><h3>5. Smart Curator</h3><p>Ranks all opportunities by business impact, effort, and risk with clear decision cards.</p></article>
-            <article class="flow-step card"><h3>6. Build & Preview</h3><p>You approve via Telegram. System builds, tests, and deploys a live preview URL in 90 seconds.</p></article>
+          <div class="timeline-flow">
+            <!-- Phase 1: Overnight Intelligence -->
+            <div class="timeline-phase">
+              <div class="phase-badge night">🌙 While You Sleep</div>
+              <h3 class="phase-title">Overnight Intelligence Gathering</h3>
+
+              <div class="phase-steps">
+                <article class="step-card card">
+                  <div class="step-icon scout-icon">🔍</div>
+                  <div class="step-content">
+                    <h4><span class="step-num">1</span> Scout Agent</h4>
+                    <p>Deep-dives into your repository structure, recent commits, open issues, dependencies, and architecture patterns. Powered by <strong>Kimi's</strong> long-context reasoning.</p>
+                  </div>
+                </article>
+
+                <article class="step-card card">
+                  <div class="step-icon market-icon">📡</div>
+                  <div class="step-content">
+                    <h4><span class="step-num">2</span> Market Intelligence</h4>
+                    <p><strong>Oxylabs</strong> scrapes competitor websites, CVE databases, and industry trends. Identifies what competitors shipped this week and emerging vulnerabilities.</p>
+                  </div>
+                </article>
+
+                <article class="step-card card">
+                  <div class="step-icon ideator-icon">💡</div>
+                  <div class="step-content">
+                    <h4><span class="step-num">3</span> Ideator Agent</h4>
+                    <p>Synthesizes repo analysis + market data into actionable opportunities. Generates improvements for both "Level Up" (fix what's broken) and "What's Next" (build what's missing).</p>
+                  </div>
+                </article>
+
+                <article class="step-card card">
+                  <div class="step-icon curator-icon">🎨</div>
+                  <div class="step-content">
+                    <h4><span class="step-num">4</span> Curator Agent</h4>
+                    <p>Ranks opportunities by impact, effort, and risk using <strong>Nosana</strong> embeddings. Creates beautiful decision cards with clear metrics and visual indicators.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <div class="timeline-divider">
+              <span class="divider-badge">☀️ You Wake Up</span>
+            </div>
+
+            <!-- Phase 2: Decision Review -->
+            <div class="timeline-phase">
+              <div class="phase-badge morning">☕ Morning Review</div>
+              <h3 class="phase-title">Prioritized Decision Cards Ready</h3>
+
+              <div class="phase-steps single-row">
+                <article class="step-card card featured-step">
+                  <div class="step-icon decision-icon">📱</div>
+                  <div class="step-content">
+                    <h4><span class="step-num">5</span> Review & Approve</h4>
+                    <p>Open your dashboard or Telegram. See 3-6 decision cards ranked by priority. Each shows impact, effort, risk, and why it matters. Optional: <strong>Nosana</strong> voice briefing explains complex cards.</p>
+                    <div class="step-visual">
+                      <span class="visual-chip">🔧 Level Up: Fix vulnerabilities</span>
+                      <span class="visual-chip">🚀 What's Next: Ship features</span>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <div class="timeline-divider">
+              <span class="divider-badge">👆 One Tap</span>
+            </div>
+
+            <!-- Phase 3: Execution -->
+            <div class="timeline-phase">
+              <div class="phase-badge execution">⚡ 90 Seconds</div>
+              <h3 class="phase-title">Automated Build & Preview</h3>
+
+              <div class="phase-steps">
+                <article class="step-card card">
+                  <div class="step-icon builder-icon">👷</div>
+                  <div class="step-content">
+                    <h4><span class="step-num">6</span> Builder Agent</h4>
+                    <p>Implements the approved change following your project's patterns. <strong>Daytona</strong> spins up an isolated sandbox, clones repo, installs dependencies.</p>
+                  </div>
+                </article>
+
+                <article class="step-card card">
+                  <div class="step-icon critic-icon">🔬</div>
+                  <div class="step-content">
+                    <h4><span class="step-num">7</span> Critic Agent</h4>
+                    <p>Adversarially validates the implementation. Runs tests, checks code quality, forces 2-3 iteration cycles until standards are met. No half-baked implementations.</p>
+                  </div>
+                </article>
+
+                <article class="step-card card">
+                  <div class="step-icon preview-icon">🌐</div>
+                  <div class="step-content">
+                    <h4><span class="step-num">8</span> Live Preview</h4>
+                    <p><strong>Daytona</strong> deploys a public preview URL. Review the working implementation, see side-by-side diffs, verify tests pass. Approve to merge or request changes.</p>
+                    <div class="step-visual">
+                      <span class="visual-chip success">✅ All tests passing</span>
+                      <span class="visual-chip success">✅ Preview live</span>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div class="how-callout card">
+            <h3>🎯 The Key Difference</h3>
+            <p>Most coding tools wait for you to tell them what to build. SleepMode PM <strong>watches your market and your code</strong>, identifies opportunities you haven't thought of, and presents them as ready-to-execute decisions. You're not coding faster—you're deciding smarter.</p>
           </div>
         </div>
       </section>
