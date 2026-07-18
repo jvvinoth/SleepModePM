@@ -79,7 +79,7 @@ export async function ideate(repo?: string): Promise<IdeationResult> {
   const signals = await getSignals(extractDeps(ctx));
   const raw = await chat(PROMPT(renderContext(ctx), renderSignals(signals)), {
     system: SYSTEM,
-    maxTokens: 6000,
+    maxTokens: 10000, // glm-5.2 counts reasoning tokens — headroom so JSON never truncates
   });
   const parsed = extractJson<{
     repoSummary: { description: string; framework: string; keyAreas: string[] };

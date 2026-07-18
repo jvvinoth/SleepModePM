@@ -4,6 +4,7 @@ import { config } from "./config.js";
 import { ideate } from "./ideator.js";
 import { createJob, getJob, serializeJob } from "./jobs.js";
 import { runBuildJob, promoteJob } from "./builder.js";
+import { loadSnapshot, saveSnapshot } from "./snapshot.js";
 import type { IdeationResult } from "./types.js";
 
 // Never let a stray rejection take the orchestrator down (Railway = crash loop otherwise).
@@ -24,20 +25,33 @@ app.use((req, res, next) => {
 
 app.get("/health", (_req, res) => res.json({ ok: true, service: "sleepmode-orchestrator" }));
 
-/** Ideation — cached in memory after first run ("it ran overnight"). ?refresh=1 regenerates. */
-let cache: IdeationResult | null = null;
+/** Ideation — served from a persisted snapshot instantly, refreshed in the background. */
+let cache: IdeationResult | null = loadSnapshot();
 let inflight: Promise<IdeationResult> | null = null;
+
+function refresh(): Promise<IdeationResult> {
+  inflight ??= ideate()
+    .then((r) => {
+      cache = r;
+      saveSnapshot(r);
+      return r;
+    })
+    .finally(() => (inflight = null));
+  return inflight;
+}
 
 app.get("/api/ideas", async (req, res) => {
   try {
-    if (req.query.refresh === "1") cache = null;
-    if (!cache) {
-      inflight ??= ideate().finally(() => (inflight = null));
-      cache = await inflight;
+    // Instant path: serve the snapshot; kick a background refresh if it's the default.
+    if (cache && req.query.refresh !== "1") {
+      if (!inflight) void refresh().catch(() => {});
+      return res.json(cache);
     }
-    res.json(cache);
+    // Cold path (no snapshot yet, or forced refresh): wait for generation.
+    res.json(await refresh());
   } catch (err) {
     console.error("[/api/ideas]", err);
+    if (cache) return res.json(cache);
     res.status(500).json({ error: (err as Error).message });
   }
 });
@@ -78,15 +92,10 @@ app.post("/api/promote", async (req, res) => {
 });
 
 app.listen(config.port, () => {
-  console.log(`orchestrator listening on :${config.port}`);
-  // Warm the ideation cache on boot — "it ran overnight". Fully fire-and-forget: it can
-  // never affect server health. Deferred so /health is answerable immediately.
-  setTimeout(() => {
-    if (cache || inflight) return;
-    inflight = ideate();
-    inflight
-      .then((r) => (cache = r))
-      .catch((e) => console.warn("[warmup] ideation failed:", (e as Error).message))
-      .finally(() => (inflight = null));
-  }, 500);
+  console.log(
+    `orchestrator listening on :${config.port}` +
+      (cache ? ` (snapshot loaded: ${cache.cards.length} cards)` : " (no snapshot)")
+  );
+  // Refresh the snapshot in the background — never blocks health or first request.
+  setTimeout(() => void refresh().catch((e) => console.warn("[warmup]", (e as Error).message)), 500);
 });
