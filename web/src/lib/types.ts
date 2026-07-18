@@ -60,6 +60,7 @@ export interface BuildJob {
 }
 
 // Prod default = Railway orchestrator. Local dev overrides via web/.env.local.
+// NB: use || not ?? — CI injects an EMPTY string when the GH var is unset.
 export const ORCH_URL =
-  process.env.NEXT_PUBLIC_ORCHESTRATOR_URL ??
+  (process.env.NEXT_PUBLIC_ORCHESTRATOR_URL || "").trim() ||
   "https://sleepmodepm-production.up.railway.app";
