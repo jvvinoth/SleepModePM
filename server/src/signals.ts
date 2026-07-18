@@ -7,7 +7,8 @@
  *    kill CONNECT tunnels), signals are simply omitted.
  * 2. Security advisories: real CVE data for the repo's dependencies from OSV.dev.
  */
-import { ProxyAgent } from "undici";
+import https from "node:https";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { config } from "./config.js";
 import type { Signal } from "./types.js";
 
@@ -18,18 +19,36 @@ const COMPETITORS = [
   { name: "Crisp", url: "https://crisp.chat/en/" },
 ];
 
-function oxylabsDispatcher(): ProxyAgent | null {
-  const { proxyHost, proxyPort, proxyUser, pass } = {
-    proxyHost: config.oxylabs.proxyHost,
-    proxyPort: config.oxylabs.proxyPort,
-    proxyUser: config.oxylabs.proxyUser,
-    pass: config.oxylabs.pass,
-  };
+function oxylabsAgent(): HttpsProxyAgent<string> | null {
+  const { proxyHost, proxyPort, proxyUser, pass } = config.oxylabs;
   if (!proxyUser || !pass) return null;
-  return new ProxyAgent({
-    uri: `http://${proxyHost}:${proxyPort}`,
-    token: "Basic " + Buffer.from(`${proxyUser}:${pass}`).toString("base64"),
-    connectTimeout: 12000,
+  const u = encodeURIComponent(proxyUser);
+  const p = encodeURIComponent(pass);
+  return new HttpsProxyAgent(`http://${u}:${p}@${proxyHost}:${proxyPort}`);
+}
+
+/** GET a URL through an https agent (Oxylabs proxy). Native https — no undici. */
+function getThroughProxy(url: string, agent: HttpsProxyAgent<string>): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const req = https.get(
+      url,
+      { agent, timeout: 20000, headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" } },
+      (res) => {
+        if ((res.statusCode ?? 500) >= 400) {
+          res.resume();
+          return reject(new Error(`HTTP ${res.statusCode}`));
+        }
+        let data = "";
+        res.setEncoding("utf8");
+        res.on("data", (c) => {
+          data += c;
+          if (data.length > 400_000) res.destroy(); // cap
+        });
+        res.on("end", () => resolve(data));
+      }
+    );
+    req.on("timeout", () => req.destroy(new Error("timeout")));
+    req.on("error", reject);
   });
 }
 
@@ -49,19 +68,13 @@ export interface CompetitorSignal extends Signal {
 
 /** Scrape competitor homepages through Oxylabs. Failures are skipped silently. */
 export async function fetchCompetitorSignals(): Promise<CompetitorSignal[]> {
-  const dispatcher = oxylabsDispatcher();
-  if (!dispatcher) return [];
+  const agent = oxylabsAgent();
+  if (!agent) return [];
 
   const results = await Promise.allSettled(
     COMPETITORS.map(async (c) => {
-      const res = await fetch(c.url, {
-        // @ts-expect-error undici dispatcher passthrough
-        dispatcher,
-        headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" },
-        signal: AbortSignal.timeout(20000),
-      });
-      if (!res.ok) throw new Error(`${res.status}`);
-      const text = stripHtml(await res.text()).slice(0, 2500);
+      const html = await getThroughProxy(c.url, agent);
+      const text = stripHtml(html).slice(0, 2500);
       return {
         name: c.name,
         source: `${c.name} (scraped live via Oxylabs)`,
