@@ -73,9 +73,10 @@ export async function fetchCompetitorSignals(): Promise<CompetitorSignal[]> {
     })
   );
 
-  const ok = results.filter((r): r is PromiseFulfilledResult<CompetitorSignal> => r.status === "fulfilled");
+  const ok: CompetitorSignal[] = [];
+  for (const r of results) if (r.status === "fulfilled") ok.push(r.value);
   console.log(`[signals] competitor scrape: ${ok.length}/${COMPETITORS.length} via Oxylabs`);
-  return ok.map((r) => r.value);
+  return ok;
 }
 
 export interface CveSignal extends Signal {
@@ -131,10 +132,15 @@ let cached: SignalBundle | null = null;
 
 export async function getSignals(deps: { name: string; version: string }[]): Promise<SignalBundle> {
   if (cached && Date.now() - Date.parse(cached.fetchedAt) < 30 * 60_000) return cached;
-  const [competitors, cves] = await Promise.all([
+  // Bulletproof: signals are enrichment, never a reason to fail ideation.
+  const [comp, cve] = await Promise.allSettled([
     fetchCompetitorSignals(),
     fetchCveSignals(deps),
   ]);
-  cached = { competitors, cves, fetchedAt: new Date().toISOString() };
+  cached = {
+    competitors: comp.status === "fulfilled" ? comp.value : [],
+    cves: cve.status === "fulfilled" ? cve.value : [],
+    fetchedAt: new Date().toISOString(),
+  };
   return cached;
 }

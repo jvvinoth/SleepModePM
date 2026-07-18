@@ -6,6 +6,10 @@ import { createJob, getJob, serializeJob } from "./jobs.js";
 import { runBuildJob, promoteJob } from "./builder.js";
 import type { IdeationResult } from "./types.js";
 
+// Never let a stray rejection take the orchestrator down (Railway = crash loop otherwise).
+process.on("unhandledRejection", (e) => console.error("[unhandledRejection]", e));
+process.on("uncaughtException", (e) => console.error("[uncaughtException]", e));
+
 const app = express();
 app.use(express.json());
 
@@ -75,12 +79,14 @@ app.post("/api/promote", async (req, res) => {
 
 app.listen(config.port, () => {
   console.log(`orchestrator listening on :${config.port}`);
-  // Warm the ideation cache on boot — "it ran overnight". First visitor sees cards instantly.
-  inflight = ideate()
-    .then((r) => (cache = r))
-    .catch((e) => {
-      console.warn("[warmup] ideation failed:", (e as Error).message);
-      return null as never;
-    })
-    .finally(() => (inflight = null)) as Promise<IdeationResult>;
+  // Warm the ideation cache on boot — "it ran overnight". Fully fire-and-forget: it can
+  // never affect server health. Deferred so /health is answerable immediately.
+  setTimeout(() => {
+    if (cache || inflight) return;
+    inflight = ideate();
+    inflight
+      .then((r) => (cache = r))
+      .catch((e) => console.warn("[warmup] ideation failed:", (e as Error).message))
+      .finally(() => (inflight = null));
+  }, 500);
 });
