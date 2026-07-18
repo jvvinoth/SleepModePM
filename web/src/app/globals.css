@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+/* SleepMode PM design tokens — see DESIGN.md */
+:root {
+  --brand-500: #1877f2;
+  --brand-600: #166fe5;
+  --brand-700: #1461cc;
+  --brand-tint: #ebf3ff;
+
+  --canvas: #f0f2f5;
+  --surface: #ffffff;
+  --surface-2: #f7f8fa;
+  --border: #e4e6eb;
+  --border-2: #dadde1;
+  --text-1: #1c1e21;
+  --text-2: #65676b;
+  --text-3: #8a8d91;
+
+  --green-500: #31a24c;
+  --green-tint: #e3f1e6;
+  --green-text: #1e7b34;
+  --amber-500: #e9a23b;
+  --amber-tint: #fcf1de;
+  --amber-text: #8a5a10;
+  --red-500: #e41e3f;
+  --red-tint: #fbe7ea;
+  --purple-500: #5b5bd6;
+  --purple-tint: #ececfb;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--text-1);
+  font-feature-settings: "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
+}
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: var(--border-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--brand-500);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 9px 16px;
+  transition: background 0.15s;
+}
+.btn-primary:hover {
+  background: var(--brand-600);
+}
+.btn-ghost {
+  color: var(--text-2);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 9px 14px;
+}
+.btn-ghost:hover {
+  background: var(--surface-2);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.pulse { animation: pulse-dot 1.6s ease-in-out infinite; }
