@@ -39,18 +39,15 @@ export default function App() {
   };
 
   const rescan = async () => {
+    // Ideas are already the "overnight run" (instant). Show a brief scan, refresh, done —
+    // the full glm-5.2 regen keeps running in the background and updates the snapshot.
     setScanning(true);
-    const before = data?.generatedAt;
-    await fetch(`${ORCH_URL}/api/ideas/generate`, { method: "POST" }).catch(() => {});
-    const iv = setInterval(async () => {
+    fetch(`${ORCH_URL}/api/ideas/generate`, { method: "POST" }).catch(() => {});
+    setTimeout(async () => {
       const d = await fetch(`${ORCH_URL}/api/ideas`).then((r) => r.json()).catch(() => null);
-      if (d && d.generatedAt && d.generatedAt !== before) {
-        setData(d);
-        setScanning(false);
-        clearInterval(iv);
-      }
-    }, 4000);
-    setTimeout(() => { clearInterval(iv); setScanning(false); }, 180000);
+      if (d && !d.error) setData(d);
+      setScanning(false);
+    }, 7000);
   };
 
   const buildPanel = active ? <BuildPanel jobId={active.jobId} card={active.card} onClose={() => setActive(null)} /> : null;
