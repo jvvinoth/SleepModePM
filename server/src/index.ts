@@ -5,6 +5,8 @@ import { ideate } from "./ideator.js";
 import { createJob, getJob, serializeJob } from "./jobs.js";
 import { runBuildJob, promoteJob } from "./builder.js";
 import { loadSnapshot, saveSnapshot } from "./snapshot.js";
+import { cachedSignals } from "./signals.js";
+import { notify } from "./telegram.js";
 import type { IdeationResult } from "./types.js";
 
 // Never let a stray rejection take the orchestrator down (Railway = crash loop otherwise).
@@ -56,6 +58,11 @@ app.get("/api/ideas", async (req, res) => {
   }
 });
 
+/** Live market signals — the Business persona's feed (competitors + CVEs). */
+app.get("/api/signals", (_req, res) => {
+  res.json(cachedSignals() ?? { competitors: [], cves: [], fetchedAt: null });
+});
+
 /** Approve a card → kick off the build pipeline → returns jobId immediately. */
 app.post("/api/approve", (req, res) => {
   const { cardId } = req.body as { cardId?: string };
@@ -64,10 +71,18 @@ app.post("/api/approve", (req, res) => {
 
   const job = createJob(card.id);
   card.status = "building";
+  void notify(`🌙 *SleepMode PM* is building:\n*${card.title}*\nI'll ping you when the preview is ready.`);
   void runBuildJob(job, card).then(() => {
     card.status = job.status === "ready" ? "ready" : "failed";
     card.previewUrl = job.previewUrl;
     card.sandboxId = job.sandboxId;
+    if (job.status === "ready") {
+      void notify(
+        `✅ *Preview ready* — ${card.title}\n${job.summary ?? ""}\n\n👀 Review: ${job.previewUrl}\n\nApprove to open a PR in the console.`
+      );
+    } else {
+      void notify(`⚠️ Build failed for *${card.title}*. Check the console.`);
+    }
   });
   res.json({ jobId: job.id });
 });

@@ -1,89 +1,85 @@
 {
   "repo": {
     "repo": "jvvinoth/mongpt-marketing",
-    "description": "MonGPT is the marketing site for an AI chat + voice customer support agent targeting Asian markets with multi-language support (Hindi, Tamil, Chinese, Malay, Japanese, Thai, and more). The site is a static Next.js export on Cloudflare Pages, featuring locale-aware landing pages, a docs hub, a pricing page, and 26+ free SEO tools that drive lead generation via a footer link mesh.",
-    "framework": "Next.js 16 (static export) · TypeScript · Tailwind CSS v4 · Cloudflare Pages",
+    "description": "Marketing site for MonGPT, an AI chat + voice support agent targeting Asian-language markets. Static Next.js export deployed to Cloudflare Pages, with 25+ free SEO tools as a traffic engine, geo-locale redirects, and hreflang-clustered localized pages across 8 languages.",
+    "framework": "Next.js 16 (static export) + Cloudflare Pages Functions",
     "fileCount": 129,
     "keyAreas": [
-      "i18n geo-locale routing",
-      "SEO tool mesh (26+ free tools)",
-      "demo widget API integration",
+      "i18n & geo-redirect",
+      "free-tools SEO mesh",
+      "demo widget integration",
       "docs hub",
-      "hreflang sitemap"
+      "markdown converters"
     ]
   },
   "cards": [
     {
       "track": "level_up",
-      "title": "Add SSRF guards and size limits to demo endpoints",
-      "rationale": "Scrape and parse-file endpoints accept arbitrary URLs and files with zero validation client-side.",
+      "title": "Add security headers in Cloudflare middleware",
+      "rationale": "Edge middleware sets zero security headers — trivial hardening at no cost.",
       "bullets": [
-        "Validate URL scheme/host in ChatWithSource loadUrl",
-        "Enforce max file size in ConverterTool onFile",
-        "Add client-side rate limiting to all /api/demo calls"
+        "Add CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy",
+        "Append headers before returning next() in onRequest handler",
+        "Also set Strict-Transport-Security for HTTPS enforcement"
       ],
       "category": "security",
-      "impact": "high",
-      "effort": "M",
+      "impact": "medium",
+      "effort": "S",
       "risk": "low",
       "targetFiles": [
-        "src/components/ChatWithSource.tsx",
-        "src/components/ConverterTool.tsx",
-        "src/components/GeneratorTool.tsx"
+        "functions/_middleware.js"
       ],
       "id": "card-1",
       "status": "proposed"
     },
     {
       "track": "level_up",
-      "title": "Add unit tests for markdown converters and i18n utils",
-      "rationale": "Core conversion logic in toMarkdown.ts and locale routing have zero test coverage.",
+      "title": "Add mobile hamburger menu to header",
+      "rationale": "Nav links are hidden below md breakpoint with no fallback — mobile users can't navigate.",
       "bullets": [
-        "Test csvToMarkdown and jsonToMarkdown edge cases",
-        "Test alternatesFor and localeHref output",
-        "Add vitest config — jsdom already in devDeps"
-      ],
-      "category": "tests",
-      "impact": "medium",
-      "effort": "S",
-      "risk": "low",
-      "targetFiles": [
-        "src/lib/toMarkdown.ts",
-        "src/lib/i18n.ts",
-        "src/lib/urls.ts",
-        "package.json"
-      ],
-      "id": "card-2",
-      "status": "proposed"
-    },
-    {
-      "track": "level_up",
-      "title": "Add mobile navigation menu to header",
-      "rationale": "Nav links are hidden on mobile with no hamburger fallback, losing conversion paths.",
-      "bullets": [
-        "Add hamburger toggle button visible below md breakpoint",
-        "Slide-down panel with all nav links and CTA",
-        "Include LocaleSwitcher inside mobile menu"
+        "Header.tsx hides nav behind hidden md:flex with no mobile toggle",
+        "Add a client-side slide-down drawer for screens under 768px",
+        "Reuse existing locale switcher and CTA buttons in the drawer"
       ],
       "category": "ux",
       "impact": "high",
       "effort": "S",
       "risk": "low",
       "targetFiles": [
-        "src/components/Header.tsx",
-        "src/components/LocaleSwitcher.tsx"
+        "src/components/Header.tsx"
+      ],
+      "id": "card-2",
+      "status": "proposed"
+    },
+    {
+      "track": "level_up",
+      "title": "Add unit tests for markdown converters and sitemap",
+      "rationale": "Zero test files in repo — pure converter functions are the lowest-hanging coverage.",
+      "bullets": [
+        "Test htmlToMarkdown, csvToMarkdown, jsonToMarkdown, xmlToMarkdown edge cases",
+        "Test hreflang cluster logic in sitemap.ts for all 8 locales",
+        "Add vitest or node:test runner to package.json scripts"
+      ],
+      "category": "tests",
+      "impact": "medium",
+      "effort": "M",
+      "risk": "low",
+      "targetFiles": [
+        "src/lib/toMarkdown.ts",
+        "src/app/sitemap.ts",
+        "package.json"
       ],
       "id": "card-3",
       "status": "proposed"
     },
     {
       "track": "whats_next",
-      "title": "Add competitor comparison pages for SEO",
-      "rationale": "Chatbase and Tidio rank for 'MonGPT vs X' queries; MonGPT has no comparison pages.",
+      "title": "Add competitor comparison pages",
+      "rationale": "Chatbase and Dante AI rank for 'vs' queries — MonGPT has zero comparison pages.",
       "bullets": [
-        "Create /compare/[slug]/ dynamic route",
-        "Feature and price comparison table component",
-        "Add comparison entries to sitemap.ts"
+        "Create /compare/[slug]/ routes mirroring the tools footer-mesh pattern",
+        "Ship Chatbase, Botpress, Intercom comparisons with feature tables",
+        "Add SoftwareApplication schema via existing JsonLd component"
       ],
       "category": "growth",
       "impact": "high",
@@ -91,8 +87,8 @@
       "risk": "low",
       "targetFiles": [
         "src/app/compare/[slug]/page.tsx",
-        "src/components/CompareTable.tsx",
-        "src/lib/dict/compare.ts",
+        "src/components/Footer.tsx",
+        "src/components/JsonLd.tsx",
         "src/app/sitemap.ts"
       ],
       "id": "card-4",
@@ -100,20 +96,19 @@
     },
     {
       "track": "whats_next",
-      "title": "Add interactive widget customizer page",
-      "rationale": "Let visitors preview and tweak widget styling before signup — visually demoable and converts.",
+      "title": "Add interactive demo chat on homepage",
+      "rationale": "HomePage has no try-it-now section — visitors can't experience the product before signup.",
       "bullets": [
-        "Color picker for brand and bubble colors",
-        "Position and greeting text controls",
-        "Live preview using DemoWidget with custom config"
+        "Embed a clickable sample conversation showing multilingual responses",
+        "Reuse DemoWidget loading pattern when NEXT_PUBLIC_DEMO_TENANT_ID is set",
+        "Add language-switcher chips so visitors see Hindi, Tamil, Japanese replies"
       ],
       "category": "feature",
-      "impact": "medium",
+      "impact": "high",
       "effort": "M",
-      "risk": "low",
+      "risk": "medium",
       "targetFiles": [
-        "src/app/customize/page.tsx",
-        "src/components/WidgetCustomizer.tsx",
+        "src/components/HomePage.tsx",
         "src/components/DemoWidget.tsx"
       ],
       "id": "card-5",
@@ -121,26 +116,25 @@
     },
     {
       "track": "whats_next",
-      "title": "Add customer testimonials and case studies page",
-      "rationale": "No social proof exists anywhere on the site; competitors feature testimonials prominently.",
+      "title": "Add email capture on free tool pages",
+      "rationale": "25+ tool pages drive SEO traffic but capture zero leads — massive leakage.",
       "bullets": [
-        "Testimonials grid with customer logos and quotes",
-        "Case study cards with before/after metrics",
-        "Add to Footer product column and sitemap"
+        "Add contextual CTA in ToolShell after result output renders",
+        "Offer 'Send results to your inbox' in exchange for email",
+        "Wire to existing /api/demo or app signup endpoint via apiBase()"
       ],
       "category": "growth",
-      "impact": "medium",
-      "effort": "M",
+      "impact": "high",
+      "effort": "S",
       "risk": "low",
       "targetFiles": [
-        "src/app/customers/page.tsx",
-        "src/components/Testimonials.tsx",
-        "src/components/Footer.tsx",
-        "src/app/sitemap.ts"
+        "src/components/ToolShell.tsx",
+        "src/components/GeneratorTool.tsx",
+        "src/components/ConverterTool.tsx"
       ],
       "id": "card-6",
       "status": "proposed"
     }
   ],
-  "generatedAt": "2026-07-18T06:33:50.643Z"
+  "generatedAt": "2026-07-18T06:47:10.654Z"
 }

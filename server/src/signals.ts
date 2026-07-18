@@ -143,6 +143,11 @@ export interface SignalBundle {
 
 let cached: SignalBundle | null = null;
 
+/** Last computed signals (populated during ideation) — for the Market Signals screen. */
+export function cachedSignals(): SignalBundle | null {
+  return cached;
+}
+
 export async function getSignals(deps: { name: string; version: string }[]): Promise<SignalBundle> {
   if (cached && Date.now() - Date.parse(cached.fetchedAt) < 30 * 60_000) return cached;
   // Bulletproof: signals are enrichment, never a reason to fail ideation.

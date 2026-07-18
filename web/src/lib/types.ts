@@ -61,6 +61,31 @@ export interface BuildJob {
 
 // Prod default = Railway orchestrator. Local dev overrides via web/.env.local.
 // NB: use || not ?? — CI injects an EMPTY string when the GH var is unset.
+export interface CompetitorSignal {
+  name: string;
+  source: string;
+  summary: string;
+  url?: string;
+  date?: string;
+  text?: string;
+}
+export interface CveSignal {
+  id: string;
+  package: string;
+  source: string;
+  summary: string;
+  url?: string;
+  severity?: string;
+  date?: string;
+}
+export interface SignalBundle {
+  competitors: CompetitorSignal[];
+  cves: CveSignal[];
+  fetchedAt: string | null;
+}
+
+export type View = "dashboard" | "signals" | "codebase" | "activity" | "settings";
+
 export const ORCH_URL =
   (process.env.NEXT_PUBLIC_ORCHESTRATOR_URL || "").trim() ||
   "https://sleepmodepm-production.up.railway.app";
