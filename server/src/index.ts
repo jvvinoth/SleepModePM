@@ -6,7 +6,8 @@ import { createJob, getJob, serializeJob } from "./jobs.js";
 import { runBuildJob, promoteJob } from "./builder.js";
 import { loadSnapshot, saveSnapshot } from "./snapshot.js";
 import { cachedSignals } from "./signals.js";
-import { notify } from "./telegram.js";
+import { notify, sendSlack, channelStatus } from "./telegram.js";
+import { knowledgeBase, leads, getLead } from "./business.js";
 import type { IdeationResult } from "./types.js";
 
 // Never let a stray rejection take the orchestrator down (Railway = crash loop otherwise).
@@ -61,6 +62,30 @@ app.get("/api/ideas", async (req, res) => {
 /** Live market signals — the Business persona's feed (competitors + CVEs). */
 app.get("/api/signals", (_req, res) => {
   res.json(cachedSignals() ?? { competitors: [], cves: [], fetchedAt: null });
+});
+
+/** Knowledge base — the company's indexed content that powers the AI agent. */
+app.get("/api/knowledge", (_req, res) => res.json(knowledgeBase));
+
+/** Leads captured by the agent, scored Hot / Warm / Cold. */
+app.get("/api/leads", (_req, res) => res.json({ leads }));
+
+/** Notification channels + status (Telegram/Slack enabled, others coming soon). */
+app.get("/api/channels", (_req, res) => res.json({ channels: channelStatus() }));
+
+/** Alert the team about a hot lead — fires Telegram + Slack. */
+app.post("/api/leads/:id/alert", async (req, res) => {
+  const lead = getLead(req.params.id);
+  if (!lead) return res.status(404).json({ error: "unknown lead" });
+  const msg =
+    `🔥 *Hot lead* — ${lead.name} (${lead.company})\n` +
+    `Intent score: *${lead.score}/100*\n` +
+    `"${lead.question}"\n` +
+    `Signals: ${lead.signals.join(", ")}\n` +
+    `Source: ${lead.source} · ${lead.language}`;
+  const [tg, sl] = await Promise.all([notify(msg), sendSlack(msg)]);
+  lead.alerted = true;
+  res.json({ telegram: tg, slack: sl });
 });
 
 /** Approve a card → kick off the build pipeline → returns jobId immediately. */

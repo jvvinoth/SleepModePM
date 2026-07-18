@@ -3,7 +3,8 @@
 import {
   Moon,
   LayoutDashboard,
-  Radar,
+  Database,
+  Flame,
   Code2,
   Activity,
   Settings,
@@ -12,9 +13,10 @@ import {
 } from "lucide-react";
 import type { View } from "@/lib/types";
 
-const NAV: { view: View; icon: typeof Radar; label: string; group?: string }[] = [
+const NAV: { view: View; icon: typeof Flame; label: string; group?: string }[] = [
   { view: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { view: "signals", icon: Radar, label: "Market Signals", group: "Business team" },
+  { view: "knowledge", icon: Database, label: "Knowledge Base", group: "Business team" },
+  { view: "leads", icon: Flame, label: "Leads" },
   { view: "codebase", icon: Code2, label: "Codebase", group: "Engineering team" },
   { view: "activity", icon: Activity, label: "Activity" },
   { view: "settings", icon: Settings, label: "Settings" },
@@ -40,8 +42,9 @@ export function Sidebar({ active, onNavigate }: { active: View; onNavigate: (v: 
       <nav className="flex-1 py-3 px-3 space-y-0.5">
         {NAV.map(({ view, icon: Icon, label, group }) => {
           const on = active === view;
-          const accent = view === "signals" ? "var(--purple-500)" : "var(--brand-500)";
-          const tint = view === "signals" ? "var(--purple-tint)" : "var(--brand-tint)";
+          const biz = view === "knowledge" || view === "leads";
+          const accent = biz ? "var(--purple-500)" : "var(--brand-500)";
+          const tint = biz ? "var(--purple-tint)" : "var(--brand-tint)";
           return (
             <div key={view}>
               {group && (

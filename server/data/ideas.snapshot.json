@@ -1,29 +1,28 @@
 {
   "repo": {
     "repo": "jvvinoth/mongpt-marketing",
-    "description": "Marketing site for MonGPT, an AI chat + voice support agent targeting Asian-language markets. Static Next.js export deployed to Cloudflare Pages, with 25+ free SEO tools as a traffic engine, geo-locale redirects, and hreflang-clustered localized pages across 8 languages.",
-    "framework": "Next.js 16 (static export) + Cloudflare Pages Functions",
+    "description": "Marketing site for MonGPT, an AI support agent offering multilingual chat and voice support targeting Asian markets. Static Next.js export on Cloudflare Pages with edge geo-locale redirects, 25+ free SEO tools, and localized docs across 9 languages.",
+    "framework": "Next.js 16 (static export) on Cloudflare Pages",
     "fileCount": 129,
     "keyAreas": [
-      "i18n & geo-redirect",
-      "free-tools SEO mesh",
-      "demo widget integration",
-      "docs hub",
-      "markdown converters"
+      "i18n geo-locale redirects",
+      "SEO tool mesh footer",
+      "Docs hub",
+      "Demo API client integrations"
     ]
   },
   "cards": [
     {
       "track": "level_up",
-      "title": "Add security headers in Cloudflare middleware",
-      "rationale": "Edge middleware sets zero security headers — trivial hardening at no cost.",
+      "title": "Add security headers to edge middleware",
+      "rationale": "Middleware only geo-redirects — no CSP, X-Frame-Options, or X-Content-Type-Options anywhere.",
       "bullets": [
-        "Add CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy",
-        "Append headers before returning next() in onRequest handler",
-        "Also set Strict-Transport-Security for HTTPS enforcement"
+        "Inject CSP, X-Frame-Options, X-Content-Type-Options on all responses",
+        "Wrap next() response with headers in functions/_middleware.js",
+        "Zero UX impact, immediate hardening against clickjacking and MIME sniffing"
       ],
       "category": "security",
-      "impact": "medium",
+      "impact": "high",
       "effort": "S",
       "risk": "low",
       "targetFiles": [
@@ -34,16 +33,16 @@
     },
     {
       "track": "level_up",
-      "title": "Add mobile hamburger menu to header",
-      "rationale": "Nav links are hidden below md breakpoint with no fallback — mobile users can't navigate.",
+      "title": "Add mobile hamburger menu navigation",
+      "rationale": "Header hides nav links below md breakpoint with no mobile fallback — visitors are stranded.",
       "bullets": [
-        "Header.tsx hides nav behind hidden md:flex with no mobile toggle",
-        "Add a client-side slide-down drawer for screens under 768px",
-        "Reuse existing locale switcher and CTA buttons in the drawer"
+        "Add slide-out drawer menu to Header.tsx for screens below md",
+        "Expose Features, Voice, Pricing, Tools, Docs links on mobile",
+        "Reuse existing locale switcher and auth buttons in drawer"
       ],
       "category": "ux",
       "impact": "high",
-      "effort": "S",
+      "effort": "M",
       "risk": "low",
       "targetFiles": [
         "src/components/Header.tsx"
@@ -53,12 +52,12 @@
     },
     {
       "track": "level_up",
-      "title": "Add unit tests for markdown converters and sitemap",
-      "rationale": "Zero test files in repo — pure converter functions are the lowest-hanging coverage.",
+      "title": "Add test infrastructure for tool components",
+      "rationale": "Zero test files exist — converter and generator logic is completely untested.",
       "bullets": [
-        "Test htmlToMarkdown, csvToMarkdown, jsonToMarkdown, xmlToMarkdown edge cases",
-        "Test hreflang cluster logic in sitemap.ts for all 8 locales",
-        "Add vitest or node:test runner to package.json scripts"
+        "Add vitest and @testing-library/react to package.json devDependencies",
+        "Unit-test toMarkdown conversion functions (html, csv, json, xml)",
+        "Component-test ConverterTool paste flow and GeneratorTool API interaction"
       ],
       "category": "tests",
       "impact": "medium",
@@ -66,7 +65,8 @@
       "risk": "low",
       "targetFiles": [
         "src/lib/toMarkdown.ts",
-        "src/app/sitemap.ts",
+        "src/components/ConverterTool.tsx",
+        "src/components/GeneratorTool.tsx",
         "package.json"
       ],
       "id": "card-3",
@@ -75,40 +75,38 @@
     {
       "track": "whats_next",
       "title": "Add competitor comparison pages",
-      "rationale": "Chatbase and Dante AI rank for 'vs' queries — MonGPT has zero comparison pages.",
+      "rationale": "No 'MonGPT vs Intercom/Tidio' pages — bottom-funnel comparison search traffic is untapped.",
       "bullets": [
-        "Create /compare/[slug]/ routes mirroring the tools footer-mesh pattern",
-        "Ship Chatbase, Botpress, Intercom comparisons with feature tables",
-        "Add SoftwareApplication schema via existing JsonLd component"
+        "Create /compare/[slug]/ pages for Intercom, Tidio, Crisp, Tawk.to",
+        "Reuse DocsLayout sidebar for feature-by-feature comparison tables",
+        "Add compare links to Footer tool mesh for sitewide link equity"
       ],
       "category": "growth",
       "impact": "high",
       "effort": "M",
       "risk": "low",
       "targetFiles": [
-        "src/app/compare/[slug]/page.tsx",
-        "src/components/Footer.tsx",
-        "src/components/JsonLd.tsx",
-        "src/app/sitemap.ts"
+        "src/components/DocsLayout.tsx",
+        "src/components/Footer.tsx"
       ],
       "id": "card-4",
       "status": "proposed"
     },
     {
       "track": "whats_next",
-      "title": "Add interactive demo chat on homepage",
-      "rationale": "HomePage has no try-it-now section — visitors can't experience the product before signup.",
+      "title": "Add interactive product demo page",
+      "rationale": "No way to try the chatbot without signup — a guided demo closes that conversion gap.",
       "bullets": [
-        "Embed a clickable sample conversation showing multilingual responses",
-        "Reuse DemoWidget loading pattern when NEXT_PUBLIC_DEMO_TENANT_ID is set",
-        "Add language-switcher chips so visitors see Hindi, Tamil, Japanese replies"
+        "Build /demo/ page with embedded chat preview using ChatWithSource component",
+        "Add step-by-step tour highlighting multilingual and voice features",
+        "Include signup CTA after demo interaction completes"
       ],
       "category": "feature",
       "impact": "high",
       "effort": "M",
-      "risk": "medium",
+      "risk": "low",
       "targetFiles": [
-        "src/components/HomePage.tsx",
+        "src/components/ChatWithSource.tsx",
         "src/components/DemoWidget.tsx"
       ],
       "id": "card-5",
@@ -116,25 +114,24 @@
     },
     {
       "track": "whats_next",
-      "title": "Add email capture on free tool pages",
-      "rationale": "25+ tool pages drive SEO traffic but capture zero leads — massive leakage.",
+      "title": "Add Shopify integration landing page",
+      "rationale": "WordPress page exists but no Shopify — a top e-commerce platform in target Asian markets.",
       "bullets": [
-        "Add contextual CTA in ToolShell after result output renders",
-        "Offer 'Send results to your inbox' in exchange for email",
-        "Wire to existing /api/demo or app signup endpoint via apiBase()"
+        "Create /shopify/ page mirroring existing /wordpress/ page structure",
+        "Target 'AI chatbot for Shopify' and 'Shopify customer support' queries",
+        "Add to Footer product links alongside existing WordPress link"
       ],
       "category": "growth",
-      "impact": "high",
+      "impact": "medium",
       "effort": "S",
       "risk": "low",
       "targetFiles": [
-        "src/components/ToolShell.tsx",
-        "src/components/GeneratorTool.tsx",
-        "src/components/ConverterTool.tsx"
+        "src/app/wordpress/page.tsx",
+        "src/components/Footer.tsx"
       ],
       "id": "card-6",
       "status": "proposed"
     }
   ],
-  "generatedAt": "2026-07-18T06:47:10.654Z"
+  "generatedAt": "2026-07-18T07:08:17.448Z"
 }

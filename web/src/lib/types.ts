@@ -84,7 +84,46 @@ export interface SignalBundle {
   fetchedAt: string | null;
 }
 
-export type View = "dashboard" | "signals" | "codebase" | "activity" | "settings";
+export interface KnowledgeDoc {
+  path: string;
+  url: string;
+  chunks: number;
+  status: "trained" | "pending" | "failed";
+}
+export interface KnowledgeBase {
+  total: number;
+  trained: number;
+  pending: number;
+  failed: number;
+  site: string;
+  documents: KnowledgeDoc[];
+}
+
+export type Temp = "hot" | "warm" | "cold";
+export interface Lead {
+  id: string;
+  name: string;
+  company: string;
+  initials: string;
+  score: number;
+  temperature: Temp;
+  intent: string;
+  signals: string[];
+  question: string;
+  source: string;
+  language: string;
+  lastActive: string;
+  alerted?: boolean;
+}
+
+export interface Channel {
+  id: string;
+  name: string;
+  enabled: boolean;
+  status: "connected" | "available" | "coming_soon";
+}
+
+export type View = "dashboard" | "knowledge" | "leads" | "codebase" | "activity" | "settings";
 
 export const ORCH_URL =
   (process.env.NEXT_PUBLIC_ORCHESTRATOR_URL || "").trim() ||

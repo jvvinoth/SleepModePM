@@ -5,12 +5,14 @@ import { Loader2 } from "lucide-react";
 import { Sidebar, TopBar } from "@/components/Shell";
 import { ConnectModal } from "@/components/ConnectModal";
 import { BuildPanel } from "@/components/BuildPanel";
-import { DashboardView, SignalsView, CodebaseView, ActivityView, SettingsView } from "@/components/Views";
-import { ORCH_URL, type IdeaCard, type IdeationResult, type SignalBundle, type View } from "@/lib/types";
+import { KnowledgeBaseView } from "@/components/KnowledgeBase";
+import { LeadsView } from "@/components/Leads";
+import { DashboardView, CodebaseView, ActivityView, SettingsView } from "@/components/Views";
+import { ORCH_URL, type Channel, type IdeaCard, type IdeationResult, type View } from "@/lib/types";
 
 export default function App() {
   const [data, setData] = useState<IdeationResult | null>(null);
-  const [signals, setSignals] = useState<SignalBundle | null>(null);
+  const [channels, setChannels] = useState<Channel[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<View>("dashboard");
   const [active, setActive] = useState<{ jobId: string; card: IdeaCard } | null>(null);
@@ -19,7 +21,7 @@ export default function App() {
 
   useEffect(() => {
     fetch(`${ORCH_URL}/api/ideas`).then((r) => r.json()).then((d) => (d.error ? setError(d.error) : setData(d))).catch((e) => setError(String(e)));
-    fetch(`${ORCH_URL}/api/signals`).then((r) => r.json()).then(setSignals).catch(() => {});
+    fetch(`${ORCH_URL}/api/channels`).then((r) => r.json()).then((d) => setChannels(d.channels ?? [])).catch(() => {});
   }, []);
 
   const approve = async (card: IdeaCard) => {
@@ -35,9 +37,8 @@ export default function App() {
     }
   };
 
-  const buildPanel = active ? (
-    <BuildPanel jobId={active.jobId} card={active.card} onClose={() => setActive(null)} />
-  ) : null;
+  const buildPanel = active ? <BuildPanel jobId={active.jobId} card={active.card} onClose={() => setActive(null)} /> : null;
+  const needsData = view === "dashboard" || view === "codebase";
 
   return (
     <div>
@@ -47,26 +48,22 @@ export default function App() {
 
       <main className="ml-60 pt-14">
         <div className="max-w-6xl mx-auto px-8 py-8">
-          {!data && !error && (
+          {needsData && !data && !error && (
             <div className="flex flex-col items-center justify-center py-32 gap-4">
               <Loader2 size={28} className="animate-spin" style={{ color: "var(--brand-500)" }} />
               <div className="text-[14px]" style={{ color: "var(--text-2)" }}>Loading your overnight run…</div>
             </div>
           )}
-          {error && (
-            <div className="card p-6 text-[14px]" style={{ color: "var(--red-500)" }}>
-              Orchestrator error: {error}
-            </div>
+          {needsData && error && (
+            <div className="card p-6 text-[14px]" style={{ color: "var(--red-500)" }}>Orchestrator error: {error}</div>
           )}
-          {data && (
-            <>
-              {view === "dashboard" && <DashboardView data={data} signals={signals} onNavigate={setView} />}
-              {view === "signals" && <SignalsView data={data} signals={signals} onBuild={approve} buildPanel={buildPanel} />}
-              {view === "codebase" && <CodebaseView data={data} onBuild={approve} buildPanel={buildPanel} />}
-              {view === "activity" && <ActivityView jobs={jobs} />}
-              {view === "settings" && <SettingsView repo={data.repo.repo} />}
-            </>
-          )}
+
+          {view === "knowledge" && <KnowledgeBaseView />}
+          {view === "leads" && <LeadsView />}
+          {view === "activity" && <ActivityView jobs={jobs} />}
+          {view === "settings" && <SettingsView repo={data?.repo.repo} channels={channels} />}
+          {view === "dashboard" && data && <DashboardView data={data} onNavigate={setView} />}
+          {view === "codebase" && data && <CodebaseView data={data} onBuild={approve} buildPanel={buildPanel} />}
         </div>
       </main>
     </div>
