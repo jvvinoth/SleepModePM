@@ -103,6 +103,12 @@ app.post("/api/knowledge/crawl", async (req, res) => {
 /** Leads captured by the agent, scored Hot / Warm / Cold (generated from the knowledge base). */
 app.get("/api/leads", (_req, res) => res.json(leadsState()));
 
+/** Manual trigger — re-scan the knowledge base for leads on demand. */
+app.post("/api/leads/generate", (_req, res) => {
+  void regenerateLeads();
+  res.json({ status: "generating" });
+});
+
 /** Notification channels + status (Telegram/Slack enabled, others coming soon). */
 app.get("/api/channels", (_req, res) => res.json({ channels: channelStatus() }));
 

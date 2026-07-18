@@ -1,35 +1,32 @@
 {
   "repo": {
     "repo": "jvvinoth/mongpt-marketing",
-    "description": "MonGPT is a marketing site for an AI support agent targeting Asian markets, featuring 25+ free SEO tools, localized landing pages in 8+ languages, and a multilingual docs hub. It's a Next.js static export deployed on Cloudflare Pages with edge-based geo-locale redirects.",
-    "framework": "Next.js 16 (static export) on Cloudflare Pages",
+    "description": "Marketing site for MonGPT, an AI chat + voice support agent targeting Asian markets with multilingual capabilities. Next.js 16 static export on Cloudflare Pages featuring 25+ free SEO tools, a docs hub, and 8 localized locales with edge geo-redirect.",
+    "framework": "Next.js 16 (static export) + Cloudflare Pages Functions",
     "fileCount": 129,
     "keyAreas": [
-      "i18n locale routing",
-      "SEO tool pages",
+      "i18n & geo-redirect middleware",
+      "SEO tool pages (25+)",
       "docs hub",
-      "demo API integration",
-      "Cloudflare middleware"
+      "Cloudflare edge middleware"
     ]
   },
   "cards": [
     {
       "track": "level_up",
-      "title": "Add rate limiting to demo API endpoints",
-      "rationale": "Demo endpoints invoke costly AI models with zero abuse protection visible in code.",
+      "title": "Add security headers to Cloudflare middleware",
+      "rationale": "Edge middleware serves zero security headers — site is exposed to clickjacking and MIME sniffing.",
       "bullets": [
-        "Wrap /api/demo/* routes with IP-based limits",
-        "Cap file uploads and scrape frequency in middleware",
-        "Return 429 with retry-after header"
+        "Set CSP, X-Frame-Options, X-Content-Type-Options in _middleware.js",
+        "Add Referrer-Policy and Permissions-Policy headers",
+        "Keep existing geo-locale redirect logic unchanged"
       ],
       "category": "security",
       "impact": "high",
       "effort": "S",
       "risk": "low",
       "targetFiles": [
-        "functions/_middleware.js",
-        "src/components/ChatWithSource.tsx",
-        "src/components/GeneratorTool.tsx"
+        "functions/_middleware.js"
       ],
       "id": "card-1",
       "status": "proposed"
@@ -37,11 +34,11 @@
     {
       "track": "level_up",
       "title": "Add mobile navigation menu to header",
-      "rationale": "Nav links are hidden below md breakpoint with no hamburger or drawer alternative.",
+      "rationale": "Nav links use hidden md:flex — mobile visitors cannot reach Pricing, Tools, or Docs.",
       "bullets": [
         "Add hamburger toggle for screens below md breakpoint",
-        "Reuse locale switcher and CTA in mobile drawer",
-        "Mirror desktop nav structure with animated slide-down"
+        "Reuse existing nav items from Header.tsx links array",
+        "Keep LocaleSwitcher and Start CTA visible at all widths"
       ],
       "category": "ux",
       "impact": "high",
@@ -55,19 +52,20 @@
     },
     {
       "track": "level_up",
-      "title": "Add unit tests for markdown converters",
-      "rationale": "Pure converter functions in toMarkdown.ts have zero test coverage and feed every tool page.",
+      "title": "Add unit tests for markdown and URL utilities",
+      "rationale": "Zero test files in repo — pure converter functions in toMarkdown.ts are completely untested.",
       "bullets": [
-        "Test htmlToMarkdown, csvToMarkdown, jsonToMarkdown edge cases",
-        "Add CI step to run tests on PR",
-        "Cover xmlToMarkdown and textToMarkdown transforms"
+        "Cover htmlToMarkdown, csvToMarkdown, jsonToMarkdown edge cases",
+        "Test localeHref and alternatesFor path generation logic",
+        "Add vitest config and npm test script to package.json"
       ],
       "category": "tests",
       "impact": "medium",
-      "effort": "S",
+      "effort": "M",
       "risk": "low",
       "targetFiles": [
         "src/lib/toMarkdown.ts",
+        "src/lib/i18n.ts",
         "package.json"
       ],
       "id": "card-3",
@@ -76,65 +74,66 @@
     {
       "track": "whats_next",
       "title": "Add competitor comparison pages",
-      "rationale": "SaaS buyers search 'MonGPT vs Intercom' before buying; these pages capture high-intent traffic.",
+      "rationale": "Intercom, Zendesk, and Tidio all ship vs-pages capturing high-intent search traffic.",
       "bullets": [
-        "Create /compare/mongpt-vs-intercom/ and similar slugs",
-        "Feature-by-feature comparison table with pricing",
-        "Auto-generate sitemap entries for each comparison page"
+        "Create /compare/intercom, /compare/zendesk, /compare/tidio routes",
+        "Reuse PricingTable data to build feature matrix component",
+        "Register new routes in sitemap.ts with 0.7 priority"
       ],
       "category": "growth",
       "impact": "high",
       "effort": "M",
       "risk": "low",
       "targetFiles": [
-        "src/app/compare/[slug]/page.tsx",
-        "src/components/CompareTable.tsx",
-        "src/app/sitemap.ts"
+        "src/app/sitemap.ts",
+        "src/app/pricing/PricingTable.tsx",
+        "src/components/Footer.tsx"
       ],
       "id": "card-4",
       "status": "proposed"
     },
     {
       "track": "whats_next",
-      "title": "Add interactive guided demo page",
-      "rationale": "Visitors need to experience the bot before signing up; current DemoWidget only loads with env flag.",
+      "title": "Add guided interactive product demo page",
+      "rationale": "DemoWidget loads the chat passively — no guided tour showcases multilingual chat or voice.",
       "bullets": [
-        "Build /demo/ with simulated chat conversations",
-        "Show language-switching and voice features live",
-        "Add guided walkthrough with step indicators"
+        "New /demo page with step-by-step annotated walkthrough",
+        "Highlight multilingual chat, voice, and lead capture flows",
+        "End with signup CTA tied to trial conversion"
       ],
       "category": "feature",
       "impact": "high",
       "effort": "M",
       "risk": "low",
       "targetFiles": [
-        "src/app/demo/page.tsx",
-        "src/components/GuidedDemo.tsx",
-        "src/components/DemoWidget.tsx"
+        "src/components/DemoWidget.tsx",
+        "src/components/Header.tsx",
+        "src/app/page.tsx"
       ],
       "id": "card-5",
       "status": "proposed"
     },
     {
       "track": "whats_next",
-      "title": "Add customer testimonials section",
-      "rationale": "Homepage lacks social proof — critical for trust in a support-agent purchase decision.",
+      "title": "Add SoftwareApplication schema to tool pages",
+      "rationale": "25+ free tool pages lack structured data — missing rich-result eligibility in search.",
       "bullets": [
-        "Add logo strip and quote cards to homepage",
-        "Create reusable TestimonialCard component",
-        "Include metrics like response time reduction"
+        "Extend JsonLd.tsx with SoftwareApplication type per tool slug",
+        "Include free offer, category, and description from tools.ts",
+        "Inject schema via ToolShell shared component"
       ],
       "category": "growth",
       "impact": "medium",
       "effort": "S",
       "risk": "low",
       "targetFiles": [
-        "src/components/HomePage.tsx",
-        "src/components/Testimonials.tsx"
+        "src/components/JsonLd.tsx",
+        "src/components/ToolShell.tsx",
+        "src/lib/tools.ts"
       ],
       "id": "card-6",
       "status": "proposed"
     }
   ],
-  "generatedAt": "2026-07-18T07:15:12.101Z"
+  "generatedAt": "2026-07-18T07:22:41.693Z"
 }

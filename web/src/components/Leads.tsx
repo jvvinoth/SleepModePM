@@ -88,6 +88,11 @@ export function LeadsView() {
     return () => clearInterval(timer.current!);
   }, []);
 
+  const generate = async () => {
+    setStatus("generating");
+    await fetch(`${ORCH_URL}/api/leads/generate`, { method: "POST" }).catch(() => {});
+  };
+
   const alert = async (l: Lead) => {
     const res = await fetch(`${ORCH_URL}/api/leads/${l.id}/alert`, { method: "POST" }).then((r) => r.json()).catch(() => ({}));
     const ch = [res.telegram && "Telegram", res.slack && "Slack"].filter(Boolean);
@@ -100,13 +105,21 @@ export function LeadsView() {
 
   return (
     <>
-      <div className="flex items-center gap-2 mb-1">
-        <Flame size={20} style={{ color: "#E24" }} />
-        <h1 className="text-[20px] font-semibold">Leads</h1>
+      <div className="flex items-start justify-between mb-1">
+        <div>
+          <div className="flex items-center gap-2">
+            <Flame size={20} style={{ color: "#E24" }} />
+            <h1 className="text-[20px] font-semibold">Leads</h1>
+          </div>
+          <p className="text-[13.5px] mt-1" style={{ color: "var(--text-2)" }}>
+            Auto-scans after every knowledge-base crawl · or trigger a scan anytime.
+          </p>
+        </div>
+        <button className="btn-primary flex items-center gap-1.5" style={{ background: "var(--purple-500)" }} onClick={generate} disabled={status === "generating"}>
+          {status === "generating" ? <><Loader2 size={15} className="animate-spin" /> Scanning…</> : <><Zap size={15} /> Scan for leads</>}
+        </button>
       </div>
-      <p className="text-[13.5px] mb-5" style={{ color: "var(--text-2)" }}>
-        Your AI agent talks to visitors using the knowledge base, scores their intent, and routes hot leads to your team instantly.
-      </p>
+      <div className="mb-5" />
 
       {leads.length === 0 && status !== "ready" ? (
         <div className="card flex flex-col items-center justify-center text-center py-20 px-6 gap-3">
@@ -121,8 +134,9 @@ export function LeadsView() {
               <Database size={28} style={{ color: "var(--text-3)" }} />
               <div className="text-[15px] font-medium">No leads yet</div>
               <div className="text-[13px] max-w-sm" style={{ color: "var(--text-2)" }}>
-                Add a page to your <strong>Knowledge Base</strong> — the agent trains on it and starts capturing leads whose questions reference your content.
+                Add a page to your <strong>Knowledge Base</strong>, then scan — the agent captures leads whose questions reference your content.
               </div>
+              <button className="btn-primary flex items-center gap-1.5 mt-1" style={{ background: "var(--purple-500)" }} onClick={generate}><Zap size={15} /> Scan for leads now</button>
             </>
           )}
         </div>
