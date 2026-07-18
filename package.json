@@ -1,0 +1,9 @@
+{
+  "name": "sleepmodepm",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "postinstall": "npm --prefix server install --no-audit --no-fund",
+    "start": "npm --prefix server start"
+  }
+}
