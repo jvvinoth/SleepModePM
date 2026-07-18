@@ -59,5 +59,7 @@ export interface BuildJob {
   error?: string;
 }
 
+// Prod default = Railway orchestrator. Local dev overrides via web/.env.local.
 export const ORCH_URL =
-  process.env.NEXT_PUBLIC_ORCHESTRATOR_URL ?? "http://localhost:8080";
+  process.env.NEXT_PUBLIC_ORCHESTRATOR_URL ??
+  "https://sleepmodepm-production.up.railway.app";
