@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { Wrench, Rocket, Files, Loader2, Moon } from "lucide-react";
 import { Sidebar, TopBar } from "@/components/Shell";
 import { IdeaCardView } from "@/components/IdeaCardView";
-import { ORCH_URL, type IdeationResult, type Track } from "@/lib/types";
+import { BuildPanel } from "@/components/BuildPanel";
+import { ORCH_URL, type IdeaCard, type IdeationResult, type Track } from "@/lib/types";
 
 export default function Dashboard() {
   const [data, setData] = useState<IdeationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Track>("level_up");
+  const [active, setActive] = useState<{ jobId: string; card: IdeaCard } | null>(null);
 
   useEffect(() => {
     fetch(`${ORCH_URL}/api/ideas`)
@@ -17,6 +19,16 @@ export default function Dashboard() {
       .then((d) => (d.error ? setError(d.error) : setData(d)))
       .catch((e) => setError(String(e)));
   }, []);
+
+  const approve = async (card: IdeaCard) => {
+    const res = await fetch(`${ORCH_URL}/api/approve`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cardId: card.id }),
+    });
+    const d = await res.json();
+    if (d.jobId) setActive({ jobId: d.jobId, card });
+  };
 
   const cards = data?.cards.filter((c) => c.track === tab) ?? [];
 
@@ -107,10 +119,15 @@ export default function Dashboard() {
                 ))}
               </div>
 
+              {/* Live build panel */}
+              {active && (
+                <BuildPanel jobId={active.jobId} card={active.card} onClose={() => setActive(null)} />
+              )}
+
               {/* Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4">
                 {cards.map((card) => (
-                  <IdeaCardView key={card.id} card={card} />
+                  <IdeaCardView key={card.id} card={card} onBuild={approve} />
                 ))}
               </div>
             </>

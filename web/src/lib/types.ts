@@ -39,5 +39,25 @@ export interface IdeationResult {
   generatedAt: string;
 }
 
+export interface JobEvent {
+  t: string;
+  step: string;
+  detail?: string;
+}
+
+export interface BuildJob {
+  id: string;
+  cardId: string;
+  status: "running" | "ready" | "failed" | "promoted";
+  events: JobEvent[];
+  previewUrl?: string;
+  sandboxId?: string;
+  summary?: string;
+  changedFiles?: string[];
+  branch?: string;
+  prUrl?: string;
+  error?: string;
+}
+
 export const ORCH_URL =
   process.env.NEXT_PUBLIC_ORCHESTRATOR_URL ?? "http://localhost:8080";

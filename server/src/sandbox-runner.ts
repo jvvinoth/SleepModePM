@@ -14,6 +14,8 @@ export interface LaunchOptions {
   branch?: string;
   setupCommand?: string; // default: npm install
   devCommand?: string; // default: npx next dev -p <port> -H 0.0.0.0
+  /** files to write into the repo after clone (path → full content) — the Builder's changes */
+  applyFiles?: Record<string, string>;
 }
 
 export interface LaunchResult {
@@ -51,6 +53,15 @@ export async function launchPreview(
     180
   );
   if (clone.exitCode !== 0) throw new Error(`clone failed: ${clone.result}`);
+
+  if (opts.applyFiles && Object.keys(opts.applyFiles).length) {
+    onProgress("files:apply", Object.keys(opts.applyFiles).join(", "));
+    for (const [path, content] of Object.entries(opts.applyFiles)) {
+      const dir = path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : ".";
+      await sandbox.process.executeCommand(`mkdir -p "${dir}"`, appDir);
+      await sandbox.fs.uploadFile(Buffer.from(content, "utf8"), `${appDir}/${path}`);
+    }
+  }
 
   onProgress("deps:install");
   const setup = opts.setupCommand ?? "npm install --no-audit --no-fund";
