@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SleepMode PM | Decide What To Build Next</title>
+    <meta
+      name="description"
+      content="SleepMode PM is the AI product manager that reads your code and your market, proposes what to build next, and ships approved changes to a live preview in minutes."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="#top" aria-label="SleepMode PM Home">
+          <span class="brand-mark">
+            <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="34" height="34" rx="8" fill="url(#brandGradient)"/>
+              <path d="M19 9C19 9 15.5 11 15.5 15.5C15.5 20 19 22 19 22C14 22 11 19 11 15.5C11 12 13.5 9 19 9Z" fill="white" opacity="0.9"/>
+              <circle cx="22" cy="11" r="1.5" fill="white" opacity="0.8"/>
+              <circle cx="25" cy="14" r="1" fill="white" opacity="0.6"/>
+              <text x="17" y="26" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="white">S</text>
+              <defs>
+                <linearGradient id="brandGradient" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#667eea"/>
+                  <stop offset="1" stop-color="#764ba2"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </span>
+          <span class="brand-text">
+            <strong>SleepMode PM</strong>
+            <small>Autonomous Product Direction</small>
+          </span>
+        </a>
+
+        <button id="menuToggle" class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          <i data-lucide="menu"></i>
+        </button>
+
+        <nav id="siteNav" class="site-nav" aria-label="Main navigation">
+          <a href="#why">Why us</a>
+          <a href="#how">How it works</a>
+          <a href="#proof">Proof</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+          <a class="btn secondary" href="#demo">Watch demo</a>
+          <a class="btn primary" href="#cta">Get early access</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero section">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">🚀 The Only AI That Decides WHAT to Build, Not Just HOW</p>
+            <h1>Stop Guessing What to Build. Your AI Product Manager Tells You.</h1>
+            <p class="lead">
+              SleepMode PM tracks market trends, monitors competitor features, identifies lead generation opportunities, and analyzes your codebase—all while you sleep. Wake up to prioritized decision cards and execute approved changes in an isolated sandbox, ready for review in 90 seconds.
+            </p>
+
+            <div class="hero-actions">
+              <a class="btn primary" href="#cta">Get Early Access — Free</a>
+              <a class="btn ghost" href="#how">Watch How It Works ▶</a>
+            </div>
+
+            <ul class="trust-row" aria-label="Product proof points">
+              <li><strong>90 sec</strong><span>Idea to live preview</span></li>
+              <li><strong>13+ hrs</strong><span>Saved per dev/week</span></li>
+              <li><strong>2 tracks</strong><span>Fix bugs + Ship features</span></li>
+            </ul>
+          </div>
+
+          <div class="hero-visual card">
+            <div class="mini-head">
+              <span class="status-pill ready"><span class="dot"></span>Live orchestrator connected</span>
+            </div>
+            <div class="mini-tabs">
+              <button class="tab-chip active">Level Up</button>
+              <button class="tab-chip what-next">What Next</button>
+            </div>
+            <article class="decision-mini">
+              <h3>🚀 Trending: 5 competitors added AI chat support this week</h3>
+              <p>Market momentum building. Users expect this feature. Build integration to stay competitive and capture 15% more leads.</p>
+              <div class="chips">
+                <span class="chip success">Business Impact: High</span>
+                <span class="chip neutral">Effort: Medium</span>
+                <span class="chip purple">Market Opportunity</span>
+              </div>
+            </article>
+            <article class="decision-mini">
+              <h3>💡 Lead Gen: Add LinkedIn sign-up for B2B audience</h3>
+              <p>Competitor analysis shows 70% conversion boost with LinkedIn auth. Low effort, high acquisition impact.</p>
+              <div class="chips">
+                <span class="chip success">Lead Gen Impact: High</span>
+                <span class="chip neutral">Effort: Small</span>
+                <span class="chip purple">Growth Feature</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="why" class="section section-alt">
+        <div class="container">
+          <h2>The bottleneck isn't coding. It's knowing what the market wants next.</h2>
+          <div class="grid-3">
+            <article class="card feature-card">
+              <i data-lucide="trending-up"></i>
+              <h3>Market trends in real-time</h3>
+              <p>
+                SleepMode PM tracks emerging trends, user demand patterns, and industry shifts to identify high-impact opportunities before your competitors do.
+              </p>
+            </article>
+            <article class="card feature-card">
+              <i data-lucide="radar"></i>
+              <h3>Competitor intelligence that matters</h3>
+              <p>
+                Monitor what your competitors are shipping, which features are gaining traction, and where gaps exist in the market landscape.
+              </p>
+            </article>
+            <article class="card feature-card">
+              <i data-lucide="users"></i>
+              <h3>Lead generation opportunities</h3>
+              <p>
+                Discover features that attract new users, identify conversion bottlenecks, and prioritize changes that drive customer acquisition.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="how" class="section">
+        <div class="container">
+          <h2>How SleepMode PM works</h2>
+          <p class="section-intro">Intelligence-first approach that turns market signals into shippable decisions.</p>
+
+          <div class="flow-grid">
+            <article class="flow-step card"><h3>1. Market Scout</h3><p>Tracks industry trends, emerging technologies, and user demand patterns across your market.</p></article>
+            <article class="flow-step card"><h3>2. Competitor Monitor</h3><p>Analyzes what competitors are shipping, which features gain traction, and where gaps exist.</p></article>
+            <article class="flow-step card"><h3>3. Lead Generator</h3><p>Identifies opportunities that drive customer acquisition, improve conversion, and increase retention.</p></article>
+            <article class="flow-step card"><h3>4. Repo Analyzer</h3><p>Scans your codebase for technical opportunities: security fixes, performance wins, and quality improvements.</p></article>
+            <article class="flow-step card"><h3>5. Smart Curator</h3><p>Ranks all opportunities by business impact, effort, and risk with clear decision cards.</p></article>
+            <article class="flow-step card"><h3>6. Build & Preview</h3><p>You approve via Telegram. System builds, tests, and deploys a live preview URL in 90 seconds.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="proof" class="section section-alt">
+        <div class="container proof-grid">
+          <div>
+            <h2>Built for real demos, not slideware</h2>
+            <p>
+              The complete loop is visible and auditable: decision card, approval event,
+              sandbox build, test results, and live preview URL.
+            </p>
+            <ul class="check-list">
+              <li><i data-lucide="check-circle-2"></i>Pre-warmed strategy cards from overnight runs</li>
+              <li><i data-lucide="check-circle-2"></i>Live approve to build to preview during demo</li>
+              <li><i data-lucide="check-circle-2"></i>Safe branch workflow before merge</li>
+            </ul>
+          </div>
+
+          <article id="demo" class="card browser-mock">
+            <div class="browser-bar">
+              <i data-lucide="lock"></i>
+              <span>https://preview.daytona.dev/run/sm-8124</span>
+            </div>
+            <div class="preview-body">
+              <h3>Preview built in 92 seconds</h3>
+              <p>Approved card: Add login rate limiting and security headers.</p>
+              <ol>
+                <li>Clone repo in Daytona sandbox</li>
+                <li>Generate patch and run checks</li>
+                <li>Publish review preview URL</li>
+              </ol>
+              <a class="btn secondary" href="#cta">Request private demo</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <h2>Powered by best-in-class infrastructure</h2>
+          <div class="sponsor-grid">
+            <div class="sponsor-pill"><strong>Daytona</strong><span>Sandbox runtime and live previews</span></div>
+            <div class="sponsor-pill"><strong>Kimi</strong><span>Repo reasoning and implementation plans</span></div>
+            <div class="sponsor-pill"><strong>Oxylabs</strong><span>Competitor and CVE signal ingestion</span></div>
+            <div class="sponsor-pill"><strong>Cloudflare</strong><span>Fast edge-hosted product experience</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" class="section section-alt">
+        <div class="container">
+          <h2>Simple early access pricing</h2>
+          <div class="pricing-grid">
+            <article class="card price-card">
+              <p class="tier">Starter</p>
+              <h3>$49<span>/month</span></h3>
+              <ul>
+                <li>1 repository analysis</li>
+                <li>5 competitor monitoring slots</li>
+                <li>3 knowledge sources/feeds</li>
+                <li>Weekly market trend reports</li>
+                <li>Basic lead generation insights</li>
+                <li>Decision cards (Level Up + What's Next)</li>
+                <li>Preview builds in Daytona sandbox</li>
+                <li>Email notifications</li>
+              </ul>
+              <a class="btn secondary" href="#cta">Get started</a>
+            </article>
+            <article class="card price-card featured">
+              <p class="tier">Growth</p>
+              <h3>$149<span>/month</span></h3>
+              <ul>
+                <li>5 repositories analysis</li>
+                <li>20 competitor monitoring slots</li>
+                <li>15 knowledge sources/feeds</li>
+                <li>Daily market trend reports</li>
+                <li>Advanced lead generation insights</li>
+                <li>Telegram + Slack approvals</li>
+                <li>Priority build queue</li>
+                <li>Team collaboration (5 seats)</li>
+                <li>API access</li>
+              </ul>
+              <a class="btn primary" href="#cta">Start growth plan</a>
+            </article>
+            <article class="card price-card">
+              <p class="tier">Enterprise</p>
+              <h3>Custom</h3>
+              <ul>
+                <li>Unlimited repositories</li>
+                <li>Unlimited competitor monitoring</li>
+                <li>Unlimited knowledge sources/feeds</li>
+                <li>Real-time market intelligence</li>
+                <li>Advanced lead generation + attribution</li>
+                <li>Private cloud orchestration</li>
+                <li>Dedicated account manager</li>
+                <li>Custom integrations</li>
+                <li>Security & compliance support</li>
+                <li>SLA guarantees</li>
+              </ul>
+              <a class="btn secondary" href="#cta">Talk to sales</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="section">
+        <div class="container faq-wrap">
+          <h2>Frequently asked questions</h2>
+          <details>
+            <summary>How is this different from coding copilots?</summary>
+            <p>
+              Coding copilots implement what you ask for. SleepMode PM tells you what to build by analyzing market trends, competitor moves, and lead generation opportunities—then implements the approved choice.
+            </p>
+          </details>
+          <details>
+            <summary>Do I need to give production credentials?</summary>
+            <p>
+              No. For onboarding, SleepMode PM runs changes in isolated Daytona sandboxes with
+              preview URLs and controlled branch workflows.
+            </p>
+          </details>
+          <details>
+            <summary>Can I approve from mobile?</summary>
+            <p>Yes. Decision cards can be approved from Telegram with one tap.</p>
+          </details>
+          <details>
+            <summary>How does SleepMode PM track market trends and competitor features?</summary>
+            <p>
+              SleepMode PM uses web scraping via Oxylabs to monitor competitor websites, product launches, and feature updates in real-time. It analyzes industry trends, user demand patterns, and emerging technologies to identify opportunities before they become mainstream.
+            </p>
+          </details>
+          <details>
+            <summary>What kind of lead generation insights does it provide?</summary>
+            <p>
+              The system identifies features that drive customer acquisition, analyzes conversion bottlenecks, tracks what attracts users to competitor products, and recommends changes that improve signup rates and user retention based on market data.
+            </p>
+          </details>
+          <details>
+            <summary>How long does it take to set up and start getting insights?</summary>
+            <p>
+              Setup takes about 5 minutes. Connect your repository, add competitor URLs to monitor, and the system starts analyzing immediately. You'll receive your first decision cards within 24 hours as the AI completes its initial market analysis and codebase scan.
+            </p>
+          </details>
+          <details>
+            <summary>Who is SleepMode PM best suited for?</summary>
+            <p>
+              Solo founders who need product direction, small development teams without a dedicated PM, startups competing in fast-moving markets, and product teams who want data-driven prioritization instead of gut-feel roadmaps.
+            </p>
+          </details>
+          <details>
+            <summary>What integrations and tools does SleepMode PM support?</summary>
+            <p>
+              Integrates with GitHub, GitLab, and Bitbucket for repository access. Uses Daytona for sandbox environments. Sends notifications via Telegram, Slack, and email. Supports CI/CD workflows and provides API access for custom integrations on Growth and Enterprise plans.
+            </p>
+          </details>
+          <details>
+            <summary>Is my code and business data secure?</summary>
+            <p>
+              Yes. All code analysis happens in isolated Daytona sandboxes. We use bank-level encryption for data at rest and in transit. Competitor monitoring uses public data only. Enterprise plans include SOC 2 compliance, private cloud deployment, and custom data retention policies.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <section id="cta" class="section section-alt cta-section">
+        <div class="container cta-card card">
+          <div>
+            <p class="eyebrow">Ship the right roadmap</p>
+            <h2>Get early access to SleepMode PM</h2>
+            <p>Join teams replacing backlog debates with approved, preview-ready decisions.</p>
+          </div>
+          <form class="cta-form" action="#" method="post">
+            <label for="email" class="sr-only">Work email</label>
+            <input id="email" type="email" placeholder="you@company.com" required />
+            <button class="btn primary" type="submit">Request invite</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-row">
+        <p>© <span id="year"></span> SleepMode PM</p>
+        <div>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
