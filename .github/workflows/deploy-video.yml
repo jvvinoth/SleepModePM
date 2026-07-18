@@ -1,0 +1,25 @@
+name: Deploy demo video → Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["video/**", ".github/workflows/deploy-video.yml"]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure Pages project exists
+        run: npx wrangler pages project create sleepmodepm-video --production-branch=main 2>/dev/null || true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Deploy video/ (static)
+        run: npx wrangler pages deploy video --project-name=sleepmodepm-video --branch=main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
