@@ -18,6 +18,7 @@ export default function App() {
   const [active, setActive] = useState<{ jobId: string; card: IdeaCard } | null>(null);
   const [jobs, setJobs] = useState<{ title: string; status: string; url?: string }[]>([]);
   const [showConnect, setShowConnect] = useState(false);
+  const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
     fetch(`${ORCH_URL}/api/ideas`).then((r) => r.json()).then((d) => (d.error ? setError(d.error) : setData(d))).catch((e) => setError(String(e)));
@@ -35,6 +36,21 @@ export default function App() {
       setActive({ jobId: d.jobId, card });
       setJobs((j) => [{ title: card.title, status: "running" }, ...j]);
     }
+  };
+
+  const rescan = async () => {
+    setScanning(true);
+    const before = data?.generatedAt;
+    await fetch(`${ORCH_URL}/api/ideas/generate`, { method: "POST" }).catch(() => {});
+    const iv = setInterval(async () => {
+      const d = await fetch(`${ORCH_URL}/api/ideas`).then((r) => r.json()).catch(() => null);
+      if (d && d.generatedAt && d.generatedAt !== before) {
+        setData(d);
+        setScanning(false);
+        clearInterval(iv);
+      }
+    }, 4000);
+    setTimeout(() => { clearInterval(iv); setScanning(false); }, 180000);
   };
 
   const buildPanel = active ? <BuildPanel jobId={active.jobId} card={active.card} onClose={() => setActive(null)} /> : null;
@@ -63,7 +79,7 @@ export default function App() {
           {view === "activity" && <ActivityView jobs={jobs} />}
           {view === "settings" && <SettingsView repo={data?.repo.repo} channels={channels} />}
           {view === "dashboard" && data && <DashboardView data={data} onNavigate={setView} />}
-          {view === "codebase" && data && <CodebaseView data={data} onBuild={approve} buildPanel={buildPanel} />}
+          {view === "codebase" && data && <CodebaseView data={data} onBuild={approve} buildPanel={buildPanel} onRescan={rescan} scanning={scanning} />}
         </div>
       </main>
     </div>

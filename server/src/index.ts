@@ -127,6 +127,12 @@ app.post("/api/leads/:id/alert", async (req, res) => {
   res.json({ telegram: tg, slack: sl });
 });
 
+/** Manual trigger — re-scan the repo and regenerate improvement ideas. */
+app.post("/api/ideas/generate", (_req, res) => {
+  void refresh();
+  res.json({ status: "generating" });
+});
+
 /** Approve a card → kick off the build pipeline → returns jobId immediately. */
 app.post("/api/approve", (req, res) => {
   const { cardId } = req.body as { cardId?: string };

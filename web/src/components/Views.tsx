@@ -16,6 +16,8 @@ import {
   Phone,
   Mail,
   Users,
+  Loader2,
+  Sparkles,
 } from "lucide-react";
 import type { Channel, IdeaCard, IdeationResult, View } from "@/lib/types";
 import { IdeaCardView } from "@/components/IdeaCardView";
@@ -76,16 +78,24 @@ export function DashboardView({ data, onNavigate }: { data: IdeationResult; onNa
 /* (Market Signals view removed — Business side is now Knowledge Base + Leads) */
 
 /* ─── Codebase: Engineering persona ─── */
-export function CodebaseView({ data, onBuild, buildPanel }: { data: IdeationResult; onBuild: (c: IdeaCard) => void; buildPanel: ReactNode }) {
+export function CodebaseView({ data, onBuild, buildPanel, onRescan, scanning }: { data: IdeationResult; onBuild: (c: IdeaCard) => void; buildPanel: ReactNode; onRescan: () => void; scanning: boolean }) {
   const cards = data.cards.filter((c) => c.track === "level_up");
   return (
     <>
       <RepoHeader data={data} />
-      <div className="flex items-center gap-2 mb-1">
-        <Wrench size={18} style={{ color: "var(--brand-500)" }} />
-        <h2 className="text-[16px] font-semibold">Level Up — improve what you have</h2>
+      <div className="flex items-start justify-between mb-1">
+        <div>
+          <div className="flex items-center gap-2">
+            <Wrench size={18} style={{ color: "var(--brand-500)" }} />
+            <h2 className="text-[16px] font-semibold">Level Up — improve what you have</h2>
+          </div>
+          <p className="text-[13px] mt-1" style={{ color: "var(--text-2)" }}>Auto-scans your repo overnight · re-scan anytime. Approve one → built &amp; previewed in a Daytona sandbox.</p>
+        </div>
+        <button className="btn-primary flex items-center gap-1.5" onClick={onRescan} disabled={scanning}>
+          {scanning ? <><Loader2 size={15} className="animate-spin" /> Scanning repo…</> : <><Sparkles size={15} /> Generate ideas</>}
+        </button>
       </div>
-      <p className="text-[13px] mb-5" style={{ color: "var(--text-2)" }}>Repo-grounded fixes. Approve one → built &amp; previewed live in a Daytona sandbox.</p>
+      <div className="mb-5" />
       {buildPanel}
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
         {cards.map((c) => <IdeaCardView key={c.id} card={c} onBuild={onBuild} />)}
